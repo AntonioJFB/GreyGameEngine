@@ -1,15 +1,28 @@
 ﻿// GreyGameEngine.cpp: define el punto de entrada de la aplicación.
 //
 
+#include <cstdint>
+#include <cstdio>
+#include <array>
+#include <vector>
+#include<iostream>
+
 #include "GreyGameEngine.h"
-#include "EntityMan.hpp"
+#include "Utils/MemViwer.hpp"
 
 using namespace std;
+using namespace MemViwer;
 
 int main()
 {
-	EntityManager::Entity entity1 {};
+	std::vector<int> a {1,2,4,8,16,32};
+	showMemObj(a);
+	showMemPtr(&a[0], 24);
 
-	cout << "First Entity: " << entity1.ID_ << endl;
+	a.push_back(64);
+
+	showMemObj(a);
+	showMemPtr(&a[0], 48);
+	
 	return 0;
 }
