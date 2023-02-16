@@ -1,15 +1,75 @@
 ﻿// GreyGameEngine.cpp: define el punto de entrada de la aplicación.
 //
 
+#include <cstdint>
+#include <cstdio>
+#include <array>
+#include <vector>
+#include<iostream>
+
 #include "GreyGameEngine.h"
-#include "EntityMan.hpp"
+#include "Utils/MemViwer.hpp"
+#include "Utils/DataStructures/SlotMap.h"
+
 
 using namespace std;
+using namespace MemViwer;
+
+struct PhysicsComponent
+{
+	int a {16};
+};
 
 int main()
 {
-	EntityManager::Entity entity1 {};
+	/*std::vector<int> a{1,2,4,8,16,32};
+	showMemObj(a);
+	showMemPtr(&a[0], 24);
 
-	cout << "First Entity: " << entity1.ID_ << endl;
+	a.push_back(64);
+
+	showMemObj(a);
+	showMemPtr(&a[0], 48);*/
+
+	SlotMap<PhysicsComponent> PhysicsSlotMap{};
+	PhysicsComponent phyCmp {1};
+	auto key1 = PhysicsSlotMap.push_back(phyCmp);
+	auto key2 = PhysicsSlotMap.push_back(PhysicsComponent{2});
+	auto key3 = PhysicsSlotMap.push_back(PhysicsComponent{3});
+	auto& cmp1 = PhysicsSlotMap.erase(key2);
+	std::cout << "PhysCMP_" << cmp1.a << "\n";
+	auto key4 = PhysicsSlotMap.push_back(PhysicsComponent{4});
+
+	showMemObj(PhysicsSlotMap);
+	
+	auto const& cmp2 = PhysicsSlotMap[key1];
+
+	std::cout << "PhysCMP_" << cmp2.a << "\n";
+
+
+	for (auto const& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << cmp.a << "\n";
+	}
+
+	for (auto& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << ++cmp.a << "\n";
+	}
+
+	for (auto const& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << cmp.a << "\n";
+	}
+
+	PhysicsSlotMap.clear();
+
+	for (auto const& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << cmp.a << "\n";
+	}
+
+	auto& cmp3 = PhysicsSlotMap[key1];
+
 	return 0;
 }
