@@ -43,6 +43,7 @@ int main()
 	
 	auto const& cmp2 = PhysicsSlotMap[key1];
 
+	PhysicsSlotMap = const_cast<SlotMap<PhysicsComponent const>>(PhysicsSlotMap);
 	for (auto const& cmp : PhysicsSlotMap)
 	{
 		std::cout << "PhysCMP_" << cmp.a << "\n";

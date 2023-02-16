@@ -5,8 +5,11 @@
 template <typename CMP_T, typename DATA_T = uint8_t, size_t Capacity = 10>
 struct SlotMap
 {
-	using iterator	= CMP_T*;
-	using citerator	= CMP_T const*;
+	//using iterator	= CMP_T*; //En windows no puede hacer la conversión de interator a CMP_T*
+	//using citerator	= CMP_T const*;
+
+	using iterator = std::_Array_iterator<CMP_T, 10>;
+	using citerator = std::_Array_const_iterator<CMP_T, 10>;
 
 	//Struct used for access the Components
 	using key_type = struct {
