@@ -103,7 +103,7 @@ constexpr CMP_T const& SlotMap<CMP_T, DATA_T, Capacity>::erase(auto const pKey) 
 template <typename CMP_T, typename DATA_T, size_t Capacity>
 constexpr bool SlotMap<CMP_T, DATA_T, Capacity>::isValid(auto const pKey) noexcept
 {
-	return !((slots_[pKey.id_].gen_ != pKey.gen_) || (pKey.id_ >= Capacity));
+	return !((slots_[pKey.id_].gen_ != pKey.gen_) || (pKey.id_ >= Capacity) || generation_ == 0);
 }
 
 //=============================================================================

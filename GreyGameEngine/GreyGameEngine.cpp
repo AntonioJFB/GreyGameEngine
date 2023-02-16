@@ -37,16 +37,39 @@ int main()
 	auto key2 = PhysicsSlotMap.push_back(PhysicsComponent{2});
 	auto key3 = PhysicsSlotMap.push_back(PhysicsComponent{3});
 	auto& cmp1 = PhysicsSlotMap.erase(key2);
+	std::cout << "PhysCMP_" << cmp1.a << "\n";
 	auto key4 = PhysicsSlotMap.push_back(PhysicsComponent{4});
 
 	showMemObj(PhysicsSlotMap);
 	
 	auto const& cmp2 = PhysicsSlotMap[key1];
 
-	PhysicsSlotMap = const_cast<SlotMap<PhysicsComponent const>>(PhysicsSlotMap);
+	std::cout << "PhysCMP_" << cmp2.a << "\n";
+
+
 	for (auto const& cmp : PhysicsSlotMap)
 	{
 		std::cout << "PhysCMP_" << cmp.a << "\n";
 	}
+
+	for (auto& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << ++cmp.a << "\n";
+	}
+
+	for (auto const& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << cmp.a << "\n";
+	}
+
+	PhysicsSlotMap.clear();
+
+	for (auto const& cmp : PhysicsSlotMap)
+	{
+		std::cout << "PhysCMP_" << cmp.a << "\n";
+	}
+
+	auto& cmp3 = PhysicsSlotMap[key1];
+
 	return 0;
 }
