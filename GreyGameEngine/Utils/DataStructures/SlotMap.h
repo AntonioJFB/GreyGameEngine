@@ -63,7 +63,7 @@ public:
 	* @param p_key Key used to find the slot we want to erase.
 	* @return Returns true if the delete action is correct, false otherwise.
 	*/
-	[[nodiscard]] constexpr CMP_T const& erase(auto const pKey) noexcept;
+	[[nodiscard]] constexpr void erase(auto const pKey) noexcept;
 
 	/**
 	* @brief Method used to clear the slots_ array and initilize again its slots.

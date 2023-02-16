@@ -9,7 +9,7 @@ constexpr auto& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponents() no
 
 template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
 template<typename CMP>
-constexpr CMP& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponent(auto pKey) noexcept
+constexpr CMP& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponent(auto const pKey) noexcept
 {
 	auto const& cmps = std::get<SlotMap<CMP, size_t, Capacity>>(components_);
 	return cmps[pKey];
@@ -42,4 +42,34 @@ constexpr auto ComponentStorage<CMP1, CMP2, CMP3, Capacity>::addComponent(Parame
 {
 	auto& cmps = std::get<SlotMap<CMP, size_t, Capacity>>(components_);
 	return cmps.push_back(CMP{std::forward<ParametersTypes>(parameters)...});
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template<typename CMP>
+constexpr void ComponentStorage<CMP1, CMP2, CMP3, Capacity>::removeComponent(auto const pKey) noexcept
+{
+	std::get<SlotMap<CMP, size_t, Capacity>>(components_).erase(pKey);
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+constexpr void ComponentStorage<CMP1, CMP2, CMP3, Capacity>::clearStorage() noexcept
+{ 
+	//TODO: Esto es bastante guarro, cuando haga la lista de CMPs tengo que cambiar a hacer un parameter pack 
+	//y con la CMPList de metaprogramming
+	std::get<SlotMap<CMP1, size_t, Capacity>>(components_).clear();
+	std::get<SlotMap<CMP2, size_t, Capacity>>(components_).clear();
+	std::get<SlotMap<CMP3, size_t, Capacity>>(components_).clear();
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template<typename CMP>
+constexpr void ComponentStorage<CMP1, CMP2, CMP3, Capacity>::clearComponents() noexcept
+{
+	std::get<SlotMap<CMP, size_t, Capacity>>(components_).clear();
 }

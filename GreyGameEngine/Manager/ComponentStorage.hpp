@@ -18,7 +18,7 @@ public:
 
 	//Funcion para coger un component (const y no const --> hacer lo de la impl de Fran)
 	template<typename CMP>
-	constexpr CMP& getComponent(auto pKey) noexcept;
+	constexpr CMP& getComponent(auto const pKey) noexcept;
 
 	//Funcion para añadir un componente pasando uno ya creado
 	template <typename CMP>
@@ -34,12 +34,18 @@ public:
 
 	//Funcion para borrar un component
 	template <typename CMP>
-	constexpr CMP& removeComponent(auto pKey) noexcept;
+	constexpr void removeComponent(auto const pKey) noexcept;
 
 	//Funcion para limpiar el storage completo
 	constexpr void clearStorage() noexcept;
 
+	//Funcion para limpiar un solo SlotMap
+	template <typename CMP>
+	constexpr void clearComponents() noexcept;
+
 private:
+	//TODO: Esto es bastante guarro, cuando haga la lista de CMPs tengo que cambiar a hacer un parameter pack 
+	//y con la CMPList de metaprogramming
 	std::tuple
 	<	SlotMap<CMP1, size_t, Capacity>
 	,	SlotMap<CMP2, size_t, Capacity>
