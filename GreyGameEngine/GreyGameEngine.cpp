@@ -2,74 +2,40 @@
 //
 
 #include <cstdint>
-#include <cstdio>
-#include <array>
-#include <vector>
-#include<iostream>
 
 #include "GreyGameEngine.h"
 #include "Utils/MemViwer.hpp"
-#include "Utils/DataStructures/SlotMap.h"
-
+#include "Manager/ComponentStorage.hpp"
 
 using namespace std;
 using namespace MemViwer;
 
 struct PhysicsComponent
 {
-	int a {16};
+	int x {16}, y{16}, z{16};
+};
+
+struct RenderComponent
+{
+	char sprite = '@';
+};
+
+struct AIComponent
+{
+	int patrol[4]{10, 20, 30, 40};
 };
 
 int main()
 {
-	/*std::vector<int> a{1,2,4,8,16,32};
-	showMemObj(a);
-	showMemPtr(&a[0], 24);
+	ComponentStorage<PhysicsComponent, RenderComponent, AIComponent, 5> cmps {};
 
-	a.push_back(64);
+	auto key1 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 1,2,3 });
+	auto key2 = cmps.addComponent<PhysicsComponent>(4,5,6);
 
-	showMemObj(a);
-	showMemPtr(&a[0], 48);*/
+	auto& PhysCmps = cmps.getComponents<PhysicsComponent>();
 
-	SlotMap<PhysicsComponent> PhysicsSlotMap{};
-	PhysicsComponent phyCmp {1};
-	auto key1 = PhysicsSlotMap.push_back(phyCmp);
-	auto key2 = PhysicsSlotMap.push_back(PhysicsComponent{2});
-	auto key3 = PhysicsSlotMap.push_back(PhysicsComponent{3});
-	auto& cmp1 = PhysicsSlotMap.erase(key2);
-	std::cout << "PhysCMP_" << cmp1.a << "\n";
-	auto key4 = PhysicsSlotMap.push_back(PhysicsComponent{4});
-
-	showMemObj(PhysicsSlotMap);
-	
-	auto const& cmp2 = PhysicsSlotMap[key1];
-
-	std::cout << "PhysCMP_" << cmp2.a << "\n";
-
-
-	for (auto const& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << cmp.a << "\n";
-	}
-
-	for (auto& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << ++cmp.a << "\n";
-	}
-
-	for (auto const& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << cmp.a << "\n";
-	}
-
-	PhysicsSlotMap.clear();
-
-	for (auto const& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << cmp.a << "\n";
-	}
-
-	auto& cmp3 = PhysicsSlotMap[key1];
+	for (auto& cmp : PhysCmps)
+		cout << "PhysCmp: { x: " << cmp.x << ", y: " << cmp.y << ", z:" << cmp.z << " }\n";
 
 	return 0;
 }

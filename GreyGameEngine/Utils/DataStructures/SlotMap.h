@@ -8,8 +8,8 @@ struct SlotMap
 	//using iterator	= CMP_T*; //En windows no puede hacer la conversión de interator a CMP_T*
 	//using citerator	= CMP_T const*;
 
-	using iterator = std::_Array_iterator<CMP_T, 10>;
-	using citerator = std::_Array_const_iterator<CMP_T, 10>;
+	using iterator = std::_Array_iterator<CMP_T, Capacity>;
+	using citerator = std::_Array_const_iterator<CMP_T, Capacity>;
 
 	//Struct used for access the Components
 	using key_type = struct {
