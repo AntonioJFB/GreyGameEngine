@@ -15,10 +15,18 @@ public:
 	//Funcion para coger un slotmap entero (const y no const --> hacer lo de la impl de Fran)
 	template<typename CMP>
 	constexpr auto& getComponents() noexcept;
+	
+	//Funcion para coger un slotmap entero const
+	template<typename CMP>
+	constexpr auto const& getComponents() const noexcept;
 
-	//Funcion para coger un component (const y no const --> hacer lo de la impl de Fran)
+	//Funcion para coger un component
 	template<typename CMP>
 	constexpr CMP& getComponent(auto const pKey) noexcept;
+
+	//Funcion para coger un component
+	template<typename CMP>
+	constexpr CMP const& getComponent(auto const pKey) const noexcept;
 
 	//Funcion para añadir un componente pasando uno ya creado
 	template <typename CMP>
@@ -51,6 +59,12 @@ private:
 	,	SlotMap<CMP2, size_t, Capacity>
 	,	SlotMap<CMP3, size_t, Capacity>
 	> components_{};
+
+	template <typename CMP>
+	static constexpr auto& getComponents_impl(auto* self) noexcept;
+
+	template<typename CMP>
+	static constexpr auto& getComponent_impl(auto const pKey, auto* self) noexcept;
 };
 
 #include "ComponentStorage.tpp"

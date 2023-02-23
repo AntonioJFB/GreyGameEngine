@@ -47,6 +47,10 @@ int main()
 	key4 = cmps.addComponent<RenderComponent>(RenderComponent{'#'});
 	key8 = cmps.addComponent<AIComponent>(AIComponent{ .patrol = {666, 777, 888, 999} });
 
+	auto const& phyCmp = cmps.getComponent<PhysicsComponent>(key1);
+	cout << "PhysCmp: { x: " << phyCmp.x << ", y: " << phyCmp.y << ", z:" << phyCmp.z << " }\n";
+
+
 	auto& PhysCmps = cmps.getComponents<PhysicsComponent>();
 
 	for (auto& cmp : PhysCmps)

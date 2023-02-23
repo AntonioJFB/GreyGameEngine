@@ -2,7 +2,25 @@ template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
 template<typename CMP>
 constexpr auto& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponents() noexcept
 {
-	return std::get<SlotMap<CMP, size_t, Capacity>>(components_);
+	return getComponents_impl<CMP>(this);
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template<typename CMP>
+constexpr auto const& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponents() const noexcept
+{
+	return getComponents_impl<CMP>(this);
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template<typename CMP>
+static constexpr auto& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponents_impl(auto* self) noexcept
+{
+	return std::get<SlotMap<CMP, size_t, Capacity>>(self->components_);
 }
 
 //=============================================================================
@@ -11,7 +29,27 @@ template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
 template<typename CMP>
 constexpr CMP& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponent(auto const pKey) noexcept
 {
-	auto const& cmps = std::get<SlotMap<CMP, size_t, Capacity>>(components_);
+	return getComponent_impl<CMP>(pKey, this);
+
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template<typename CMP>
+constexpr CMP const& ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponent(auto const pKey) const noexcept
+{
+	return getComponent_impl<CMP>(pKey, this);
+}
+
+//=============================================================================
+
+template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template<typename CMP>
+static constexpr auto& 
+ComponentStorage<CMP1, CMP2, CMP3, Capacity>::getComponent_impl(auto const pKey, auto* self) noexcept
+{
+	auto& cmps = std::get<SlotMap<CMP, size_t, Capacity>>(self->components_);
 	return cmps[pKey];
 }
 
