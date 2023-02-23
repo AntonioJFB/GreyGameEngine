@@ -2,74 +2,70 @@
 //
 
 #include <cstdint>
-#include <cstdio>
-#include <array>
-#include <vector>
-#include<iostream>
 
 #include "GreyGameEngine.h"
 #include "Utils/MemViwer.hpp"
-#include "Utils/DataStructures/SlotMap.h"
-
+#include "Manager/ComponentStorage.hpp"
 
 using namespace std;
 using namespace MemViwer;
 
 struct PhysicsComponent
 {
-	int a {16};
+	int x {16}, y{16}, z{16};
+};
+
+struct RenderComponent
+{
+	char sprite = '@';
+};
+
+struct AIComponent
+{
+	int patrol[4]{10, 20, 30, 40};
 };
 
 int main()
 {
-	/*std::vector<int> a{1,2,4,8,16,32};
-	showMemObj(a);
-	showMemPtr(&a[0], 24);
+	ComponentStorage<PhysicsComponent, RenderComponent, AIComponent, 5> cmps {};
 
-	a.push_back(64);
+	auto key1 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 1,2,3 });
+	auto key2 = cmps.addComponent<PhysicsComponent>(4,5,6);
+	auto key3 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 8,9,10 });
+	auto key4 = cmps.addComponent<RenderComponent>('a'); 
+	auto key5 = cmps.addComponent<RenderComponent>('b');
+	auto key6 = cmps.addComponent<AIComponent>(); 
+	auto key7 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 11,12,13 });
+	auto key8 = cmps.addComponent<AIComponent>();
 
-	showMemObj(a);
-	showMemPtr(&a[0], 48);*/
+	cmps.removeComponent<PhysicsComponent>(key1);
+	cmps.removeComponent<PhysicsComponent>(key2);
+	cmps.removeComponent<RenderComponent>(key4);
+	cmps.removeComponent<AIComponent>(key8);
 
-	SlotMap<PhysicsComponent> PhysicsSlotMap{};
-	PhysicsComponent phyCmp {1};
-	auto key1 = PhysicsSlotMap.push_back(phyCmp);
-	auto key2 = PhysicsSlotMap.push_back(PhysicsComponent{2});
-	auto key3 = PhysicsSlotMap.push_back(PhysicsComponent{3});
-	auto& cmp1 = PhysicsSlotMap.erase(key2);
-	std::cout << "PhysCMP_" << cmp1.a << "\n";
-	auto key4 = PhysicsSlotMap.push_back(PhysicsComponent{4});
+	key1 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ .x = 20, .y = 90, .z = 2 });
+	key4 = cmps.addComponent<RenderComponent>(RenderComponent{'#'});
+	key8 = cmps.addComponent<AIComponent>(AIComponent{ .patrol = {666, 777, 888, 999} });
 
-	showMemObj(PhysicsSlotMap);
+	auto const& phyCmp = cmps.getComponent<PhysicsComponent>(key1);
+	cout << "PhysCmp: { x: " << phyCmp.x << ", y: " << phyCmp.y << ", z:" << phyCmp.z << " }\n";
+
+
+	auto& PhysCmps = cmps.getComponents<PhysicsComponent>();
+
+	for (auto& cmp : PhysCmps)
+		cout << "PhysCmp: { x: " << cmp.x << ", y: " << cmp.y << ", z:" << cmp.z << " }\n";
 	
-	auto const& cmp2 = PhysicsSlotMap[key1];
+	auto& RenderCmps = cmps.getComponents<RenderComponent>();
 
-	std::cout << "PhysCMP_" << cmp2.a << "\n";
+	for (auto& cmp : RenderCmps)
+		cout << "RenderCmp: " << cmp.sprite << "\n";
 
 
-	for (auto const& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << cmp.a << "\n";
-	}
+	auto& AIcmps = cmps.getComponents<AIComponent>();
 
-	for (auto& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << ++cmp.a << "\n";
-	}
-
-	for (auto const& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << cmp.a << "\n";
-	}
-
-	PhysicsSlotMap.clear();
-
-	for (auto const& cmp : PhysicsSlotMap)
-	{
-		std::cout << "PhysCMP_" << cmp.a << "\n";
-	}
-
-	auto& cmp3 = PhysicsSlotMap[key1];
+	for (auto& cmp : AIcmps)
+		cout << "AICmps: [ " << cmp.patrol[0] << ", " << cmp.patrol[1] << ", " << cmp.patrol[2] << ", " << cmp.patrol[3] << " ]\n";
 
 	return 0;
 }

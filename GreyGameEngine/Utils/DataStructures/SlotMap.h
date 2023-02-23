@@ -8,8 +8,8 @@ struct SlotMap
 	//using iterator	= CMP_T*; //En windows no puede hacer la conversión de interator a CMP_T*
 	//using citerator	= CMP_T const*;
 
-	using iterator = std::_Array_iterator<CMP_T, 10>;
-	using citerator = std::_Array_const_iterator<CMP_T, 10>;
+	using iterator = std::_Array_iterator<CMP_T, Capacity>;
+	using citerator = std::_Array_const_iterator<CMP_T, Capacity>;
 
 	//Struct used for access the Components
 	using key_type = struct {
@@ -63,7 +63,7 @@ public:
 	* @param p_key Key used to find the slot we want to erase.
 	* @return Returns true if the delete action is correct, false otherwise.
 	*/
-	[[nodiscard]] constexpr CMP_T const& erase(auto const pKey) noexcept;
+	[[nodiscard]] constexpr void erase(auto const pKey) noexcept;
 
 	/**
 	* @brief Method used to clear the slots_ array and initilize again its slots.

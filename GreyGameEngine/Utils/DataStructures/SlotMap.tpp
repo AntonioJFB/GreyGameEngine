@@ -75,13 +75,11 @@ SlotMap<CMP_T, DATA_T, Capacity>::push_back(CMP_T const& pCMP)
 //=============================================================================
 
 template <typename CMP_T, typename DATA_T, size_t Capacity>
-constexpr CMP_T const& SlotMap<CMP_T, DATA_T, Capacity>::erase(auto const pKey) noexcept
+constexpr void SlotMap<CMP_T, DATA_T, Capacity>::erase(auto const pKey) noexcept
 {
 	assert(("The key is not valid!", isValid(pKey)));
 
 	auto& slot = slots_[pKey.id_];
-
-	auto const& retCMP_T = data_[slot.id_];
 
 	if(slot.id_ != size_-1)
 		copyLast(slot.id_);
@@ -94,8 +92,6 @@ constexpr CMP_T const& SlotMap<CMP_T, DATA_T, Capacity>::erase(auto const pKey) 
 
 	++generation_;
 	--size_;
-
-	return retCMP_T;
 }
 
 //=============================================================================
