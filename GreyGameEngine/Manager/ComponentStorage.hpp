@@ -64,7 +64,7 @@ private:
 	static constexpr auto& getComponents_impl(auto* self) noexcept;
 
 	template<typename CMP>
-	static constexpr auto& getComponent_impl(auto const pKey, auto* self) noexcept;
+	[[nodiscard]] static constexpr auto& getComponent_impl(auto const pKey, auto* self) noexcept;
 };
 
 #include "ComponentStorage.tpp"
