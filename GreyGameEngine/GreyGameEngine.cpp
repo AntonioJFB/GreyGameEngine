@@ -5,7 +5,7 @@
 
 #include "GreyGameEngine.h"
 #include "Utils/MemViwer.hpp"
-#include "Manager/ComponentStorage.hpp"
+#include "Manager/EntityManager.hpp"
 
 using namespace std;
 using namespace MemViwer;
@@ -27,7 +27,11 @@ struct AIComponent
 
 int main()
 {
-	ComponentStorage<PhysicsComponent, RenderComponent, AIComponent, 5> cmps {};
+	EntityManager<PhysicsComponent, RenderComponent, AIComponent, 5>EM{5};
+
+	auto& entity =  EM.createEntity();
+	PhysicsComponent physcmp{};
+	auto& cmp = EM.addComponent<PhysicsComponent>(entity, physcmp);
 
 	return 0;
 }
