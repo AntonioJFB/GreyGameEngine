@@ -9,73 +9,171 @@
 template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
 struct EntityManager
 {
+	//Type used for storage the components
 	using storage_type = ComponentStorage<CMP0, CMP1, CMP2, Capacity>;
+
+	//Type of the Entities
 	using Entity_t = Entity<CMP0, CMP1, CMP2, Capacity>;
+
+	//Type of the Storage for the entities
 	using EntitiesStorage_t = std::vector<Entity_t>;
 
+	/*
+	* @brief Constructor of the EntitytManager. Reserves the initial size for the vector of entities.
+	* @param pCapacity: Initial number of entities.
+	*/
 	constexpr explicit EntityManager(const size_t pCapacity = 5) noexcept;
 
-	//CreateEntity
+	/*
+	* @brief Method to create a new Entity and add it to the Entity Storage.
+	* @return reference to the created Entity	
+	*/
 	[[nodiscard]] constexpr Entity_t& createEntity() noexcept;
 
-	//GetEntities
+	/*
+	* @brief Method to get a Reference to the Storage of Entities.
+	* @return reference to the Storafge of Entities.
+	*/
 	[[nodiscard]] inline EntitiesStorage_t& getEntities() noexcept { return entities_; }
+
+	/*
+	* @brief Method to get a const Reference to the Storage of Entities.
+	* @return const reference to the Storafge of Entities.
+	*/
 	[[nodiscard]] inline EntitiesStorage_t const& getEntities() const noexcept { return entities_; }
 
-	//GetEntityByID
+	/*
+	* @brief Method to get a Reference to an Entity.
+	* @param pID: ID of the entity you want to get
+	* @return reference to the Entity.
+	*/
 	[[nodiscard]] inline Entity_t const* getEntityByID(auto const pID) const noexcept { return GetEntityByID_impl(this, pID); }
+	
+	/*
+	* @brief Method to get a const Reference to an Entity.
+	* @param pID: ID of the entity you want to get
+	* @return const reference to the Entity.
+	*/
 	[[nodiscard]] inline Entity_t* getEntityByID(auto const pID) noexcept { return GetEntityByID_impl(this, pID); }
 
-	//AddComponent
+	/*
+	* @brief Method to add a component to an Entity
+	* @tparam CMP: type of the component to add
+	* @param pEntity: Reference to the Entity that will have the component
+	* @param pCmp: L Reference to the component to add
+	* @return Reference to the new component
+	*/
 	template<typename CMP>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, CMP& pComponent) noexcept;
 
+	/*
+	* @brief Method to add a component to an Entity
+	* @tparam CMP: type of the component to add
+	* @param pEntity: Reference to the Entity that will have the component
+	* @param pCmp: Temporal Reference to the component to add
+	* @return Reference to the new component
+	*/
 	template<typename CMP>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept;
 
+	/*
+	* @brief Method to add a component to an Entity
+	* @param pEntity: Reference to the Entity that will have the component
+	* @tparam CMP: type of the component to add, ParamterTypes...: Types of the parameter pack
+	* @param parameters: Parameter pack with the necessary parameters to create the Component
+	* @return Reference to the new component
+	*/
 	template<typename CMP, typename... ParamTypes>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept;
 
-	//RemoveComponentFromEntity
+	/*
+	* @brief Method to remove a component from an Entity
+	* @tparam CMP: type of the component to remove
+	* @param pEntity: Reference to the Entity to remove the component
+	*/
 	template<typename CMP>
 	void constexpr removeComponent(Entity_t& pEntity) noexcept;
 
-	//TODO: RemoveComponentsFromEntity
+	/*
+	* @brief Method to remove a series of components from an Entity
+	* @tparam CMPs: types of the components to remove
+	* @param pEntity: Reference to the Entity to remove the components
+	*/
 	template<typename... CMPs>
 	void constexpr removeComponents (Entity_t& pEntity) noexcept;
 
-	//Funcion para coger un componente
+	/*
+	* @brief Method to get a component from an Entity
+	* @tparam CMP: type of the component to get
+	* @param pEntity: Reference to the Entity that has the component
+	* @return Reference to the component
+	*/
 	template<typename CMP>
 	[[nodiscard]] inline CMP& getComponent(Entity_t const& pEntity) noexcept { return getComponent_impl<CMP>(pEntity, this); }
 
-	//Funcion para coger un componente version const --> Tengo que hacer la de impl
+	/*
+	* @brief Method to get a component from an Entity
+	* @tparam CMP: type of the component to get
+	* @param pEntity: Reference to the Entity that has the component
+	* @return Const Reference to the component
+	*/
 	template<typename CMP>
 	[[nodiscard]] inline CMP const& getComponent(Entity_t const& pEntity) const noexcept { return getComponent_impl<CMP>(pEntity, this); }
 
-	//Funcion para coger todos los componentes del mismo tipo--> Tengo que hacer la de impl
+	/*
+	* @brief Method to get all the components of type CMP
+	* @tparam CMP: type of the components to get
+	* @return Reference to the SlotMap of components
+	*/
 	template<typename CMP>
 	[[nodiscard]] inline auto& getComponents() noexcept { return getComponents_impl<CMP>(this); }
 	
-	//Funcion para coger todos los componentes del mismo tipo const --> Tengo que hacer la de impl
+	/*
+	* @brief Method to get all the components of type CMP
+	* @tparam CMP: type of the components to get
+	* @return Const Reference to the SlotMap of components
+	*/
 	template<typename CMP>
 	[[nodiscard]] inline auto const& getComponents() const noexcept { return getComponents_impl<CMP>(this); }
 
 	//TODO: SetEntityForDestroy
 	//TODO: Update
+	//TODO: Forall
+	//TODO: ForAllMatching
+	//TODO: ForAllMatchingPairs
 
 private:
 
+	//Vector of entities
 	EntitiesStorage_t	entities_{}; //TODO: Mas adelante, cuando la cosa ya este furulando, probar a cambiarlo por array
+	
+	//Components storage
 	storage_type		components_{};
 	
-	//GetEntityByID_impl
-	[[nodiscard]] static constexpr auto* GetEntityByID_impl(auto* slef, const auto pID) noexcept;
+	/*
+	* @brief Implementation Method to get an Entity given an ID
+	* @param self: Pointer to this to know if it is const or not
+	* @param pID: ID of the entity to get
+	* @return Const/Or no const Reference to the Entity
+	*/
+	[[nodiscard]] static constexpr auto* GetEntityByID_impl(auto* self, const auto pID) noexcept;
 
-	//Funcion para coger un componente _impl
+	/*
+	* @brief Implementation Method to get a Component given an Entity
+	* @tparam CMP Type of the CMP to get
+	* @param pEntity: ID of the entity to get
+	* @param self: Pointer to this to know if it is const or not
+	* @return Const/Or no const Reference to the Component
+	*/
 	template<typename CMP>
 	[[nodiscard]]static constexpr auto& getComponent_impl(Entity_t const& pEntity, auto* self) noexcept;
 
-	//Funcion para coger un componente _impl
+	/*
+	* @brief Implementation Method to get all Components given an Entity
+	* @tparam CMP Type of the CMPs to get
+	* @param self: Pointer to this to know if it is const or not
+	* @return Const/Or no const Reference to the SlotMap of Components
+	*/
 	template<typename CMP>
 	[[nodiscard]] static constexpr auto& getComponents_impl(auto* self) noexcept;
 
