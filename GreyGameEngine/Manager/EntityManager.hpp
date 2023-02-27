@@ -25,25 +25,40 @@ struct EntityManager
 	//GetEntityByID
 	[[nodiscard]] inline Entity_t const* getEntityByID(auto const pID) const noexcept { return GetEntityByID_impl(this, pID); }
 	[[nodiscard]] inline Entity_t* getEntityByID(auto const pID) noexcept { return GetEntityByID_impl(this, pID); }
-	
+
 	//AddComponent
 	template<typename CMP>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, CMP& pComponent) noexcept;
-	
+
 	template<typename CMP>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept;
-	
+
 	template<typename CMP, typename... ParamTypes>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept;
 
-	
-	/*/Funcion para coger un componente
+	//RemoveComponentFromEntity
 	template<typename CMP>
-	[[nodiscard]] constexpr CMP& getComponent(Entity_t&) noexcept;
+	void constexpr removeComponent(Entity_t& pEntity) noexcept;
+
+	//TODO: RemoveComponentsFromEntity
+	template<typename... CMPs>
+	void constexpr removeComponents (Entity_t& pEntity) noexcept;
+
+	//Funcion para coger un componente
+	template<typename CMP>
+	[[nodiscard]] inline CMP& getComponent(Entity_t const& pEntity) noexcept { return getComponent_impl<CMP>(pEntity, this); }
 
 	//Funcion para coger un componente version const --> Tengo que hacer la de impl
 	template<typename CMP>
-	[[nodiscard]] constexpr CMP const& getComponent(Entity_t const&) const noexcept;*/
+	[[nodiscard]] inline CMP const& getComponent(Entity_t const& pEntity) const noexcept { return getComponent_impl<CMP>(pEntity, this); }
+
+	//Funcion para coger todos los componentes del mismo tipo--> Tengo que hacer la de impl
+	template<typename CMP>
+	[[nodiscard]] inline auto& getComponents() noexcept { return getComponents_impl<CMP>(this); }
+	
+	//Funcion para coger todos los componentes del mismo tipo const --> Tengo que hacer la de impl
+	template<typename CMP>
+	[[nodiscard]] inline auto const& getComponents() const noexcept { return getComponents_impl<CMP>(this); }
 
 	//TODO: SetEntityForDestroy
 	//TODO: Update
@@ -56,18 +71,24 @@ private:
 	//GetEntityByID_impl
 	[[nodiscard]] static constexpr auto* GetEntityByID_impl(auto* slef, const auto pID) noexcept;
 
+	//Funcion para coger un componente _impl
+	template<typename CMP>
+	[[nodiscard]]static constexpr auto& getComponent_impl(Entity_t const& pEntity, auto* self) noexcept;
+
+	//Funcion para coger un componente _impl
+	template<typename CMP>
+	[[nodiscard]] static constexpr auto& getComponents_impl(auto* self) noexcept;
+
 	//USANDO EL TAG DISPATCHING --> TODO: LUEGO ESTO SE AUTOMATIZA CON METAPROGRAMMING
 	[[nodiscard]] inline uint8_t getCMPId(CMP0) const noexcept { return 1; }
 	[[nodiscard]] inline uint8_t getCMPId(CMP1) const noexcept { return 2; }
-	[[nodiscard]] inline uint8_t getCMPId(CMP2) const noexcept { return 3; }
+	[[nodiscard]] inline uint8_t getCMPId(CMP2) const noexcept { return 4; }
 	
-	//TODO: GetComponent_impl
 	//TODO: GetComponents_impl
 	//TODO: ForAllMatchin_impl
 	//TODO: ForAllMatchinPairs_impl
+	
 	//TODO: IsEntityMatchingTheSignature
-	//TODO: RemoveComponentFromEntity
-	//TODO: RemoveComponentsFromEntity
 	//TODO: RemoveDeadEntities
 };
 

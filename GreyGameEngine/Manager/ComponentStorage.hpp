@@ -10,7 +10,7 @@ public:
 	constexpr explicit ComponentStorage() = default;
 
 	//Making this class non copiable
-	//NON_COPIABLE_CLASS(ComponentStorage)
+	//NON_COPIABLE_CLASS(ComponentStorage);
 
 	//Funcion para coger un slotmap entero (const y no const --> hacer lo de la impl de Fran)
 	template<typename CMP>

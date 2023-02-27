@@ -78,3 +78,47 @@ EntityManager<CMP0, CMP1, CMP2, Capacity>::addComponent(Entity_t& pEntity, CMP&&
 
 	return components_.getComponent<CMP>(key);
 }
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename CMP>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::removeComponent(Entity_t& pEntity) noexcept
+{
+	assert(("The entity doesn't have this component!", pEntity.hasComponent(getCMPId(CMP{}))));
+
+	auto key = pEntity.removeComponent<CMP>(getCMPId(CMP{}));
+	components_.removeComponent<CMP>(key);
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename... CMPs>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::removeComponents(Entity_t& pEntity) noexcept
+{
+	(removeComponent<CMPs>(pEntity), ...);
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename CMP>
+constexpr auto&
+EntityManager<CMP0, CMP1, CMP2, Capacity>::getComponent_impl(Entity_t const& pEntity, auto* self) noexcept
+{
+	auto key = pEntity.getComponent<CMP>();
+	return self->components_.getComponent<CMP>(key);
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename CMP>
+constexpr auto&
+EntityManager<CMP0, CMP1, CMP2, Capacity>::getComponents_impl(auto* self) noexcept
+{
+	return self->components_.getComponents<CMP>();
+}
