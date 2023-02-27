@@ -27,11 +27,16 @@ struct AIComponent
 
 int main()
 {
+	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types y demás tipos
 	EntityManager<PhysicsComponent, RenderComponent, AIComponent, 5>EM{5};
 
 	auto& entity =  EM.createEntity();
-	PhysicsComponent physcmp{};
-	auto& cmp = EM.addComponent<PhysicsComponent>(entity, physcmp);
+	
+	auto& cmp = EM.addComponent<PhysicsComponent>(entity, 1, 2, 3);
+	auto& cmp1 = EM.addComponent<RenderComponent>(entity, '#');
+
+	cout << "PhysCMP: { " << cmp.x << ", " << cmp.y << ", " << cmp.z << " }\n";
+	cout << "RenderCMP: { " << cmp1.sprite << " }\n";
 
 	return 0;
 }

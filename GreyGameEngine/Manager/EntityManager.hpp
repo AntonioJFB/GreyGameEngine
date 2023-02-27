@@ -30,8 +30,11 @@ struct EntityManager
 	template<typename CMP>
 	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, CMP& pComponent) noexcept;
 	
-	/*template<typename CMP, typename... ParamTypes>
-	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept;*/
+	template<typename CMP>
+	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept;
+	
+	template<typename CMP, typename... ParamTypes>
+	[[nodiscard]] constexpr CMP& addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept;
 
 	
 	/*/Funcion para coger un componente
@@ -54,9 +57,9 @@ private:
 	[[nodiscard]] static constexpr auto* GetEntityByID_impl(auto* slef, const auto pID) noexcept;
 
 	//USANDO EL TAG DISPATCHING --> TODO: LUEGO ESTO SE AUTOMATIZA CON METAPROGRAMMING
-	[[nodiscard]] inline uint8_t getCMPId(CMP0) const noexcept { return 0; }
-	[[nodiscard]] inline uint8_t getCMPId(CMP1) const noexcept { return 1; }
-	[[nodiscard]] inline uint8_t getCMPId(CMP2) const noexcept { return 2; }
+	[[nodiscard]] inline uint8_t getCMPId(CMP0) const noexcept { return 1; }
+	[[nodiscard]] inline uint8_t getCMPId(CMP1) const noexcept { return 2; }
+	[[nodiscard]] inline uint8_t getCMPId(CMP2) const noexcept { return 3; }
 	
 	//TODO: GetComponent_impl
 	//TODO: GetComponents_impl

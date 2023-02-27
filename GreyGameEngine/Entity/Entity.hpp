@@ -15,7 +15,7 @@ public:
 	friend struct EntityManager;
 
 	template <typename T>
-	using key_type = SlotMap<T, uint8_t, Capacity>::key_type;
+	using key_type = SlotMap<T, size_t, Capacity>::key_type; //TODO: El segundo parametro deberia ser del mismo tipo que el de los slotmaps de del componentSotrage
 
 	//TODO: Cuando vea la metaprogramming, tengo que modificarlo
 	using key_storageT = std::tuple<key_type<CMP0>, key_type<CMP1>, key_type<CMP2>>;
@@ -63,3 +63,5 @@ private:
 	//TODO: GetTag
 	//TODO: GetTags
 };
+
+#include "Entity.tpp"

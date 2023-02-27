@@ -41,12 +41,39 @@ template <typename CMP>
 constexpr CMP& 
 EntityManager<CMP0, CMP1, CMP2, Capacity>::addComponent(Entity_t& pEntity, CMP& pComponent) noexcept
 {
-	//1.- Deberia comprobar si la entidad ya tiene ese componente
-	//2.- Si lo tiene, deberia devolver el que tiene
-	//3.- Si no lo tiene deberia crearlo y devolverlo
+	return addComponent<CMP>(pEntity, CMP{pComponent});
+}
 
-	auto key = components_.addComponent<CMP>(pComponent);
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename CMP, typename... ParamTypes>
+constexpr CMP&
+EntityManager<CMP0, CMP1, CMP2, Capacity>::addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept
+{
+	return addComponent<CMP>(pEntity, CMP{ std::forward<ParamTypes>(pParams)... });
+
+	//TODO: Otra opcion a parte podria ser hacer como abajo y pasar los params... para la funcion del componentStorage que tmb recibe los params asi
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename CMP>
+constexpr CMP&
+EntityManager<CMP0, CMP1, CMP2, Capacity>::addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept
+{
+	//1.- Deberia comprobar si la entidad ya tiene ese componente
+	if(pEntity.hasComponent(getCMPId(CMP{})))
+	{
+		//2.- Si lo tiene, deberia devolver el que tiene
+		auto key = pEntity.getComponent<CMP>();
+		return components_.getComponent<CMP>(key);
+	}
 	
+	//3.- Si no lo tiene deberia crearlo y devolverlo
+	auto key = components_.addComponent<CMP>(pComponent);
+
 	pEntity.addComponent<CMP>(key, getCMPId(CMP{})); //TODO: Tengo error de linker aqui. No se por que
 
 	return components_.getComponent<CMP>(key);
