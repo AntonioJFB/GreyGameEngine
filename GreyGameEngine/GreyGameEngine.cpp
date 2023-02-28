@@ -5,7 +5,7 @@
 
 #include "GreyGameEngine.h"
 #include "Utils/MemViwer.hpp"
-#include "Manager/ComponentStorage.hpp"
+#include "Manager/EntityManager.hpp"
 
 using namespace std;
 using namespace MemViwer;
@@ -25,47 +25,34 @@ struct AIComponent
 	int patrol[4]{10, 20, 30, 40};
 };
 
+enum Tags : uint8_t
+{
+	Player = 1, Enemy = 2, Obstacle = 3
+};
+
 int main()
 {
-	ComponentStorage<PhysicsComponent, RenderComponent, AIComponent, 5> cmps {};
+	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types, TagMaks y demás tipos
+	EntityManager<PhysicsComponent, RenderComponent, AIComponent, 5>EM{5};
 
-	auto key1 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 1,2,3 });
-	auto key2 = cmps.addComponent<PhysicsComponent>(4,5,6);
-	auto key3 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 8,9,10 });
-	auto key4 = cmps.addComponent<RenderComponent>('a'); 
-	auto key5 = cmps.addComponent<RenderComponent>('b');
-	auto key6 = cmps.addComponent<AIComponent>(); 
-	auto key7 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ 11,12,13 });
-	auto key8 = cmps.addComponent<AIComponent>();
+	auto& entity = EM.createEntity();
 
-	cmps.removeComponent<PhysicsComponent>(key1);
-	cmps.removeComponent<PhysicsComponent>(key2);
-	cmps.removeComponent<RenderComponent>(key4);
-	cmps.removeComponent<AIComponent>(key8);
+	/*TODO: La inicializacion de una entidad deberia ir justo despues de su crecion porque, de momento, como uso vector.
+	si creo muchas entidades y hace resize, pierdo la referencia a esas entidades y casca el programa.*/
 
-	key1 = cmps.addComponent<PhysicsComponent>(PhysicsComponent{ .x = 20, .y = 90, .z = 2 });
-	key4 = cmps.addComponent<RenderComponent>(RenderComponent{'#'});
-	key8 = cmps.addComponent<AIComponent>(AIComponent{ .patrol = {666, 777, 888, 999} });
-
-	auto const& phyCmp = cmps.getComponent<PhysicsComponent>(key1);
-	cout << "PhysCmp: { x: " << phyCmp.x << ", y: " << phyCmp.y << ", z:" << phyCmp.z << " }\n";
-
-
-	auto& PhysCmps = cmps.getComponents<PhysicsComponent>();
-
-	for (auto& cmp : PhysCmps)
-		cout << "PhysCmp: { x: " << cmp.x << ", y: " << cmp.y << ", z:" << cmp.z << " }\n";
+	auto& phycmp = EM.addComponent<PhysicsComponent>(entity, PhysicsComponent{});
+	auto& aicmp = EM.addComponent<AIComponent>(entity, AIComponent{});
+	auto& rendcmp = EM.addComponent<RenderComponent>(entity, RenderComponent{});
 	
-	auto& RenderCmps = cmps.getComponents<RenderComponent>();
+	auto& entity2 = EM.createEntity();
+	EM.addTag(entity2, Tags::Player);
+	auto& entity3 = EM.createEntity();
+	EM.addTag(entity3, Tags::Enemy);
 
-	for (auto& cmp : RenderCmps)
-		cout << "RenderCmp: " << cmp.sprite << "\n";
+	auto& entity4 = EM.createEntity();
+	auto& entity5 = EM.createEntity();
 
-
-	auto& AIcmps = cmps.getComponents<AIComponent>();
-
-	for (auto& cmp : AIcmps)
-		cout << "AICmps: [ " << cmp.patrol[0] << ", " << cmp.patrol[1] << ", " << cmp.patrol[2] << ", " << cmp.patrol[3] << " ]\n";
+	EM.forAll();
 
 	return 0;
 }
