@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cstdio>
 
 template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
 constexpr EntityManager<CMP0, CMP1, CMP2, Capacity>::EntityManager(const size_t pCapacity) noexcept
@@ -121,4 +122,68 @@ constexpr auto&
 EntityManager<CMP0, CMP1, CMP2, Capacity>::getComponents_impl(auto* self) noexcept
 {
 	return self->components_.getComponents<CMP>();
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::checkDeadEntities() noexcept
+{
+		bool thereAreDeadEntities {false};
+	
+		for(auto& e : entities_)
+		{
+			if (e.getID() == NON_VALID_ENTITY_ID)
+			{
+				thereAreDeadEntities = true;
+				removeComponents<CMP0, CMP1, CMP2>(e); //!!!!!!! TODO: Aqui debo pasarle la lista de componentes que tiene la entidad. Puede ser que no tenga todos los componentes.
+			}
+		}
+
+		if (thereAreDeadEntities)
+			removeDeadEntities();
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::removeDeadEntities() noexcept
+{
+	entities_.erase(std::remove_if(	entities_.begin(), entities_.end(), 
+									[](Entity_t const& e){
+										return e.getID() == NON_VALID_ENTITY_ID;
+									}), 
+									entities_.end());
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+constexpr void 
+EntityManager<CMP0, CMP1, CMP2, Capacity>::forAll() noexcept
+{
+	//SI le pongo una captura, el lambda ya no es convertible a puntero a funcion.
+	//Un lambda  es un struct con el operador llamada, si le pongo captura va a tener variables miembro.
+	//Si no le pongo captura, el objeto solo tiene la funcion y eso si que es convertible a puntero a funcion.
+	//Un struct que lleva variables miembro no lo puedo convertir a funcion. Pero un struct que solo lleva
+	//una funcion si qu elo puedo convertir a funcion.
+
+	//TODO: Esto es una implementacion de juguete
+	forAll_impl([](Entity_t& e){
+		std::cout << "Pito de " << e.getID() << "\n";
+	});
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::forAll_impl(TypeProcessFunc process) noexcept
+{
+	//TODO: Esto es una implementacion de juguete
+
+	for (auto& e : entities_)
+		process(e);
 }

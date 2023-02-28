@@ -30,19 +30,30 @@ int main()
 	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types, TagMaks y demás tipos
 	EntityManager<PhysicsComponent, RenderComponent, AIComponent, 5>EM{5};
 
-	auto& entity =  EM.createEntity();
+	auto& entity = EM.createEntity();
+
+	/*TODO: La inicializacion de una entidad deberia ir justo despues de su crecion porque, de momento, como uso vector.
+	si creo muchas entidades y hace resize, pierdo la referencia a esas entidades y casca el programa.*/
+
+	auto& phycmp = EM.addComponent<PhysicsComponent>(entity, PhysicsComponent{});
+	auto& aicmp = EM.addComponent<AIComponent>(entity, AIComponent{});
+	auto& rendcmp = EM.addComponent<RenderComponent>(entity, RenderComponent{});
 	
-	auto& cmp = EM.addComponent<PhysicsComponent>(entity, 1, 2, 3);
-	auto& cmp1 = EM.addComponent<RenderComponent>(entity, '#');
-	auto& cmp2 = EM.addComponent<AIComponent>(entity, AIComponent{}); //TODO: Si no paso ninun parametro para crear el componente no se crea bien el objeto. !!!
 
-	auto& AIcmp = EM.getComponent<AIComponent>(entity);
+	auto& entity2 = EM.createEntity();
+	auto& entity3 = EM.createEntity();
+	auto& entity4 = EM.createEntity();
+	auto& entity5 = EM.createEntity();
+	auto& entity6 = EM.createEntity();
 
-	auto& AIcmps = EM.getComponents<AIComponent>();
 
-	EM.removeComponents<PhysicsComponent, RenderComponent, AIComponent>(entity);
+	EM.forAll();
 
-	EM.addComponent<PhysicsComponent>(entity, PhysicsComponent{});
+	auto* e = EM.getEntityByID(1);
+	EM.setEntitiyForDestroy(*e);
+	EM.checkDeadEntities();
+
+	EM.forAll();
 
 	return 0;
 }

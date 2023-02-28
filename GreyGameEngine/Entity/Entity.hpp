@@ -43,6 +43,11 @@ public:
 	inline size_t getID() const noexcept { return ID_; }
 
 	/*
+	*@brief Method to set the ID of an Entity
+	*/
+	inline void setID(size_t pID) noexcept { ID_ = pID; }
+
+	/*
 	*@brief Method to know if an Entity has a component.
 	* @param pId: ID of the component to check
 	* @return true if has the component. False if not.

@@ -136,16 +136,33 @@ struct EntityManager
 	template<typename CMP>
 	[[nodiscard]] inline auto const& getComponents() const noexcept { return getComponents_impl<CMP>(this); }
 
-	//TODO: SetEntityForDestroy
-	//TODO: Update
 	//TODO: Forall
+	constexpr void forAll() noexcept;
 	//TODO: ForAllMatching
 	//TODO: ForAllMatchingPairs
+	
+	//TODO: SetEntityForDestroy
+	
+	//checkDeadEntities
+	void constexpr checkDeadEntities() noexcept;
+
+	//Set Entity for Destroy
+	constexpr void setEntitiyForDestroy(Entity_t& pEntity) noexcept { pEntity.setID(NON_VALID_ENTITY_ID); }
 
 private:
 
 	//Vector of entities
-	EntitiesStorage_t	entities_{}; //TODO: Mas adelante, cuando la cosa ya este furulando, probar a cambiarlo por array
+	EntitiesStorage_t	entities_{}; 
+	/*TODO: El problema de usar vector, es que si se hace resize y tengo guardada una referencia a una entidad,
+			esa referencia deja de ser valida porque los objetos se han movido de sitio.
+			Si borro entidades y hago un shrink to fit, los objetos tambien se van a mover y si tengo guardadas referencias 
+			a esos objetos a lo mejor me las cargo tmb.
+			Llevar cuidado y no guardarme referencias de objetos sueltos por ahi porque pueden cambiar.
+			-------------------------------------------
+			El problema de usar array es que no puedo hacer resize si llega un momento en el que necesito mas entidades.
+			Si lo hago con array, a la hora de borrar y añadir nuevas entidades necesito un control de posiciones libres y demas
+			con indicadores de tamanyo y proxima posicion libre. Tipo como con el slotmap.
+	*/
 	
 	//Components storage
 	storage_type		components_{};
@@ -182,12 +199,16 @@ private:
 	[[nodiscard]] inline uint8_t getCMPId(CMP1) const noexcept { return 2; }
 	[[nodiscard]] inline uint8_t getCMPId(CMP2) const noexcept { return 4; }
 	
-	//TODO: GetComponents_impl
+	//TODO: ForAll_impl
+	using TypeProcessFunc = void(*)(Entity_t&);
+	constexpr void forAll_impl(TypeProcessFunc process) noexcept;
 	//TODO: ForAllMatchin_impl
 	//TODO: ForAllMatchinPairs_impl
 	
 	//TODO: IsEntityMatchingTheSignature
-	//TODO: RemoveDeadEntities
+	
+	//RemoveDeadEntities
+	constexpr void removeDeadEntities() noexcept;
 };
 
 #include "EntityManager.tpp"
