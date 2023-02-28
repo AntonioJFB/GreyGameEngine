@@ -136,17 +136,30 @@ struct EntityManager
 	template<typename CMP>
 	[[nodiscard]] inline auto const& getComponents() const noexcept { return getComponents_impl<CMP>(this); }
 
+	//TODO: Todo lo relacionado con los Tags está cogido con pinzas porque lo voy a cambiar con metaprogramming
+	//TODO: AddTag
+	inline void addTag(Entity_t& pEntity, const uint8_t pTag) noexcept { pEntity.addTag(pTag); }
+	//TODO: RemoveTag
+	inline void removeTag(Entity_t& pEntity, const uint8_t pTag) noexcept { pEntity.removeTag(pTag); }
+
+
+	//TODO: Todo lo del forAll lo tengo que hacer bien una vez tenga sistemas y metaprogramming funcionando
 	//TODO: Forall
 	constexpr void forAll() noexcept;
 	//TODO: ForAllMatching
 	//TODO: ForAllMatchingPairs
 	
-	//TODO: SetEntityForDestroy
-	
-	//checkDeadEntities
+	/*
+	* @brief Method that checks if there are entities marked as dead.
+	* If an Entity is marked with an invalid ID, it erases all the components of the entity.
+	* If there are Dead entities, it calls removeDeadEntites. 
+	*/
 	void constexpr checkDeadEntities() noexcept;
 
-	//Set Entity for Destroy
+	/*
+	* @brief Method that sets to an invalid ID the ID of an entity to mark it as dead.
+	* @param pEntity: Reference to the Entity to be marked as dead
+	*/
 	constexpr void setEntitiyForDestroy(Entity_t& pEntity) noexcept { pEntity.setID(NON_VALID_ENTITY_ID); }
 
 private:
@@ -207,7 +220,9 @@ private:
 	
 	//TODO: IsEntityMatchingTheSignature
 	
-	//RemoveDeadEntities
+	/*
+	* @brief Method that erases all the Dead Entities from entities_
+	*/
 	constexpr void removeDeadEntities() noexcept;
 };
 

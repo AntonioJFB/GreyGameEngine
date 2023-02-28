@@ -25,6 +25,11 @@ struct AIComponent
 	int patrol[4]{10, 20, 30, 40};
 };
 
+enum Tags : uint8_t
+{
+	Player = 1, Enemy = 2, Obstacle = 3
+};
+
 int main()
 {
 	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types, TagMaks y demás tipos
@@ -39,19 +44,13 @@ int main()
 	auto& aicmp = EM.addComponent<AIComponent>(entity, AIComponent{});
 	auto& rendcmp = EM.addComponent<RenderComponent>(entity, RenderComponent{});
 	
-
 	auto& entity2 = EM.createEntity();
+	EM.addTag(entity2, Tags::Player);
 	auto& entity3 = EM.createEntity();
+	EM.addTag(entity3, Tags::Enemy);
+
 	auto& entity4 = EM.createEntity();
 	auto& entity5 = EM.createEntity();
-	auto& entity6 = EM.createEntity();
-
-
-	EM.forAll();
-
-	auto* e = EM.getEntityByID(1);
-	EM.setEntitiyForDestroy(*e);
-	EM.checkDeadEntities();
 
 	EM.forAll();
 

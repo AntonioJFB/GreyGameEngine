@@ -172,7 +172,8 @@ EntityManager<CMP0, CMP1, CMP2, Capacity>::forAll() noexcept
 
 	//TODO: Esto es una implementacion de juguete
 	forAll_impl([](Entity_t& e){
-		std::cout << "Pito de " << e.getID() << "\n";
+		std::cout << "Entity_" << e.getID() << "\n";
+		std::cout << "Tags:  " << e.getTags() << "\n";
 	});
 }
 

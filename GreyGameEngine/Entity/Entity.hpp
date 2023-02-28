@@ -102,12 +102,19 @@ private:
 	template<typename CMP>
 	auto constexpr removeComponent(auto pCMPId) noexcept;
 
+	//TODO: Todo lo relacionado con los tags esta cogido con pinzas porque lo voy a cambiar con metaprogramming
 	//TODO: AddTag
+	inline void addTag(uint8_t const pTag) noexcept { tags_ |= pTag; }
 	//TODO: AddTags
+	// 
 	//TODO: RemoveTag
+	inline void removeTag(uint8_t const pTag) noexcept { tags_ ^= pTag; }
 	//TODO: RemoveTags
-	//TODO: GetTag
+	// 
+	//TODO: HasTag
+	[[nodiscard]] inline bool hasTag(uint8_t const pTag) noexcept { tags_& pTag; }
 	//TODO: GetTags
+	[[nodiscard]] inline uint8_t getTags() const noexcept { return tags_; }
 };
 
 #include "Entity.tpp"
