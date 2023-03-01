@@ -65,7 +65,9 @@ constexpr CMP&
 EntityManager<CMP0, CMP1, CMP2, Capacity>::addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept
 {
 	//1.- Deberia comprobar si la entidad ya tiene ese componente
-	if(pEntity.hasComponent(getCMPId(CMP{})))
+	auto cmpMask = getMask<CMP>();
+
+	if(pEntity.hasComponent(cmpMask))
 	{
 		//2.- Si lo tiene, deberia devolver el que tiene
 		auto key = pEntity.getComponent<CMP>();
@@ -75,7 +77,7 @@ EntityManager<CMP0, CMP1, CMP2, Capacity>::addComponent(Entity_t& pEntity, CMP&&
 	//3.- Si no lo tiene deberia crearlo y devolverlo
 	auto key = components_.addComponent<CMP>(pComponent);
 
-	pEntity.addComponent<CMP>(key, getCMPId(CMP{})); //TODO: Tengo error de linker aqui. No se por que
+	pEntity.addComponent<CMP>(key, cmpMask);
 
 	return components_.getComponent<CMP>(key);
 }
@@ -87,9 +89,11 @@ template <typename CMP>
 constexpr void
 EntityManager<CMP0, CMP1, CMP2, Capacity>::removeComponent(Entity_t& pEntity) noexcept
 {
-	assert(("The entity doesn't have this component!", pEntity.hasComponent(getCMPId(CMP{}))));
+	auto cmpMask = getMask<CMP>();
 
-	auto key = pEntity.removeComponent<CMP>(getCMPId(CMP{}));
+	assert(("The entity doesn't have this component!", pEntity.hasComponent(cmpMask)));
+
+	auto key = pEntity.removeComponent<CMP>(cmpMask);
 	components_.removeComponent<CMP>(key);
 }
 
@@ -122,6 +126,26 @@ constexpr auto&
 EntityManager<CMP0, CMP1, CMP2, Capacity>::getComponents_impl(auto* self) noexcept
 {
 	return self->components_.getComponents<CMP>();
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::addTag(Entity_t& pEntity, const auto pTag) noexcept
+{
+	auto tagMask = getMask(pTag); //TODO: Esto cuando meta metaprogramming va a cambiar
+	pEntity.addTag(tagMask);
+}
+
+//=============================================================================
+
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+constexpr void
+EntityManager<CMP0, CMP1, CMP2, Capacity>::removeTag(Entity_t& pEntity, const auto pTag) noexcept
+{
+	auto tagMask = getMask(pTag); //TODO: Esto cuando meta metaprogramming va a cambiar
+	pEntity.removeTag(tagMask);
 }
 
 //=============================================================================

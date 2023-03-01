@@ -62,9 +62,11 @@ private:
 	size_t ID_{++nextID};
 
 	//Components bit mask
+	using cmp_mask_type = uint8_t;
 	uint8_t components_{};
 	
 	//Tagas bit mask
+	using tag_mask_type = uint8_t;
 	uint8_t tags_{};
 
 	//Storage of Component keys
@@ -83,7 +85,7 @@ private:
 	*@brief Method to get all the component keys
 	* @return const reference to the key storage
 	*/
-	[[nodiscard]] constexpr auto const& getComponentKeys() const noexcept;
+	[[nodiscard]] inline auto const& getComponentKeys() const noexcept { return key_storage; }
 
 	/*
 	*@brief Method to add a component to an Entity.
@@ -92,7 +94,7 @@ private:
 	* @param pCMPId ID of the component to add to the mask
 	*/
 	template<typename CMP>
-	[[nodiscard]] constexpr void addComponent(auto pSlotKey, auto pCMPId) noexcept;
+	[[nodiscard]] constexpr void addComponent(auto pSlotKey, auto pCMPMask) noexcept;
 
 	/*
 	*@brief Method to remove a component from an Entity.
@@ -100,21 +102,21 @@ private:
 	* @param pCMPId ID of the component to be removed form the mask
 	*/
 	template<typename CMP>
-	auto constexpr removeComponent(auto pCMPId) noexcept;
+	auto constexpr removeComponent(auto pCMPMask) noexcept;
 
 	//TODO: Todo lo relacionado con los tags esta cogido con pinzas porque lo voy a cambiar con metaprogramming
 	//TODO: AddTag
-	inline void addTag(uint8_t const pTag) noexcept { tags_ |= pTag; }
+	inline void addTag(tag_mask_type const pTagMask) noexcept { tags_ |= pTagMask; }
 	//TODO: AddTags
 	// 
 	//TODO: RemoveTag
-	inline void removeTag(uint8_t const pTag) noexcept { tags_ ^= pTag; }
+	inline void removeTag(tag_mask_type const pTagMask) noexcept { tags_ ^= pTagMask; }
 	//TODO: RemoveTags
 	// 
 	//TODO: HasTag
-	[[nodiscard]] inline bool hasTag(uint8_t const pTag) noexcept { tags_& pTag; }
+	[[nodiscard]] inline bool hasTag(tag_mask_type const pTagMask) noexcept { tags_& pTagMask; }
 	//TODO: GetTags
-	[[nodiscard]] inline uint8_t getTags() const noexcept { return tags_; }
+	[[nodiscard]] inline tag_mask_type getTags() const noexcept { return tags_; }
 };
 
 #include "Entity.tpp"

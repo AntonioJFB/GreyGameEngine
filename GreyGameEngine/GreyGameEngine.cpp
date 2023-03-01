@@ -27,7 +27,7 @@ struct AIComponent
 
 enum Tags : uint8_t
 {
-	Player = 1, Enemy = 2, Obstacle = 3
+	Player = 0, Enemy = 1, Obstacle = 2
 };
 
 int main()
@@ -48,8 +48,11 @@ int main()
 	EM.addTag(entity2, Tags::Player);
 	auto& entity3 = EM.createEntity();
 	EM.addTag(entity3, Tags::Enemy);
-
 	auto& entity4 = EM.createEntity();
+	EM.addTag(entity4, Tags::Obstacle);
+	EM.addTag(entity4, Tags::Enemy);
+	EM.removeTag(entity4, Tags::Obstacle);
+
 	auto& entity5 = EM.createEntity();
 
 	EM.forAll();

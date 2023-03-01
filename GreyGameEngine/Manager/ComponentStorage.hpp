@@ -3,7 +3,7 @@
 #include <tuple>
 #include "../Utils/DataStructures/SlotMap.h"
 
-template <typename CMP1, typename CMP2, typename CMP3, size_t Capacity>
+template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
 class ComponentStorage
 {
 public:
@@ -104,10 +104,13 @@ private:
 	//y con la CMPList de metaprogramming
 
 	//Tuple that contains the SlotMaps of components
+	template<typename CMP_T>
+	using CMP_Storage_Type = SlotMap<CMP_T, size_t, Capacity>;
+
 	std::tuple
-	<	SlotMap<CMP1, size_t, Capacity>
-	,	SlotMap<CMP2, size_t, Capacity>
-	,	SlotMap<CMP3, size_t, Capacity>
+	<	CMP_Storage_Type<CMP0>
+	,	CMP_Storage_Type<CMP1>
+	,	CMP_Storage_Type<CMP2>
 	> components_{};
 
 	/*

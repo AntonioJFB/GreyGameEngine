@@ -138,9 +138,9 @@ struct EntityManager
 
 	//TODO: Todo lo relacionado con los Tags está cogido con pinzas porque lo voy a cambiar con metaprogramming
 	//TODO: AddTag
-	inline void addTag(Entity_t& pEntity, const uint8_t pTag) noexcept { pEntity.addTag(pTag); }
+	constexpr void addTag(Entity_t& pEntity, const auto pTag) noexcept;
 	//TODO: RemoveTag
-	inline void removeTag(Entity_t& pEntity, const uint8_t pTag) noexcept { pEntity.removeTag(pTag); }
+	constexpr void removeTag(Entity_t& pEntity, const auto pTag) noexcept;
 
 
 	//TODO: Todo lo del forAll lo tengo que hacer bien una vez tenga sistemas y metaprogramming funcionando
@@ -161,6 +161,23 @@ struct EntityManager
 	* @param pEntity: Reference to the Entity to be marked as dead
 	*/
 	constexpr void setEntitiyForDestroy(Entity_t& pEntity) noexcept { pEntity.setID(NON_VALID_ENTITY_ID); }
+
+	//Type for the IDs and masks of components.
+	using cmp_mask_type = uint8_t;
+	 
+	/*
+	* @brief Method that gets the ID of a component
+	* @return the ID of a Component
+	*/
+	template<typename CMP>
+	[[nodiscard]] inline cmp_mask_type getCMPId() const noexcept { return getCMPId(CMP{}); }
+
+	/*
+	* @brief Method that gets the Mask of a component
+	* @return the bitmask of a Component
+	*/
+	template <typename CMP>
+	[[nodiscard]] inline cmp_mask_type getMask() const noexcept { return getMask(getCMPId<CMP>()); }
 
 private:
 
@@ -207,11 +224,15 @@ private:
 	template<typename CMP>
 	[[nodiscard]] static constexpr auto& getComponents_impl(auto* self) noexcept;
 
+
 	//USANDO EL TAG DISPATCHING --> TODO: LUEGO ESTO SE AUTOMATIZA CON METAPROGRAMMING
-	[[nodiscard]] inline uint8_t getCMPId(CMP0) const noexcept { return 1; }
-	[[nodiscard]] inline uint8_t getCMPId(CMP1) const noexcept { return 2; }
-	[[nodiscard]] inline uint8_t getCMPId(CMP2) const noexcept { return 4; }
-	
+	//TODO: Esto a lo mejor deberia moverlo al component storage. De momento lo dejo aqui
+	//TODO: SI quiero acceder a los elementos del component estorage haciendo uso del ID estas funciones y las dos publicas de arriba deberian ser static.
+	[[nodiscard]] inline cmp_mask_type getCMPId(CMP0) const noexcept { return 0; }
+	[[nodiscard]] inline cmp_mask_type getCMPId(CMP1) const noexcept { return 1; }
+	[[nodiscard]] inline cmp_mask_type getCMPId(CMP2) const noexcept { return 2; }
+	[[nodiscard]] inline auto getMask(auto const pID) const noexcept { return 1 << pID; }
+
 	//TODO: ForAll_impl
 	using TypeProcessFunc = void(*)(Entity_t&);
 	constexpr void forAll_impl(TypeProcessFunc process) noexcept;
