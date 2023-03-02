@@ -6,7 +6,7 @@
 #include "ComponentStorage.hpp"
 #include "../Entity/Entity.hpp"
 
-template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
 struct EntityManager
 {
 	//Type used for storage the components
@@ -136,11 +136,20 @@ struct EntityManager
 	template<typename CMP>
 	[[nodiscard]] inline auto const& getComponents() const noexcept { return getComponents_impl<CMP>(this); }
 
+	//TODO: HasComponent
+	template<typename CMP>
+	[[nodiscard]] constexpr bool hasComponent(Entity_t& pEntity) const noexcept;
+
 	//TODO: Todo lo relacionado con los Tags está cogido con pinzas porque lo voy a cambiar con metaprogramming
 	//TODO: AddTag
-	constexpr void addTag(Entity_t& pEntity, const auto pTag) noexcept;
+	template <typename TAG>
+	constexpr void addTag(Entity_t& pEntity) noexcept;
 	//TODO: RemoveTag
-	constexpr void removeTag(Entity_t& pEntity, const auto pTag) noexcept;
+	template <typename TAG>
+	constexpr void removeTag(Entity_t& pEntity) noexcept;
+	//TODO: HasTag
+	template <typename TAG>
+	constexpr bool hasTag(Entity_t& pEntity) noexcept;
 
 
 	//TODO: Todo lo del forAll lo tengo que hacer bien una vez tenga sistemas y metaprogramming funcionando
@@ -163,21 +172,21 @@ struct EntityManager
 	constexpr void setEntitiyForDestroy(Entity_t& pEntity) noexcept { pEntity.setID(NON_VALID_ENTITY_ID); }
 
 	//Type for the IDs and masks of components.
-	using cmp_mask_type = uint8_t;
+	using mask_type = uint8_t;
 	 
 	/*
-	* @brief Method that gets the ID of a component
+	* @brief Method that gets the ID of a component or a tag
 	* @return the ID of a Component
 	*/
-	template<typename CMP>
-	[[nodiscard]] inline cmp_mask_type getCMPId() const noexcept { return getCMPId(CMP{}); }
+	template<typename T>
+	[[nodiscard]] static inline mask_type getId() noexcept { return getId(T{}); }
 
 	/*
-	* @brief Method that gets the Mask of a component
+	* @brief Method that gets the Mask of a component or a Tag
 	* @return the bitmask of a Component
 	*/
-	template <typename CMP>
-	[[nodiscard]] inline cmp_mask_type getMask() const noexcept { return getMask(getCMPId<CMP>()); }
+	template <typename T>
+	[[nodiscard]] static inline mask_type getMask() noexcept { return getMask(getId<T>()); }
 
 private:
 
@@ -228,10 +237,15 @@ private:
 	//USANDO EL TAG DISPATCHING --> TODO: LUEGO ESTO SE AUTOMATIZA CON METAPROGRAMMING
 	//TODO: Esto a lo mejor deberia moverlo al component storage. De momento lo dejo aqui
 	//TODO: SI quiero acceder a los elementos del component estorage haciendo uso del ID estas funciones y las dos publicas de arriba deberian ser static.
-	[[nodiscard]] inline cmp_mask_type getCMPId(CMP0) const noexcept { return 0; }
-	[[nodiscard]] inline cmp_mask_type getCMPId(CMP1) const noexcept { return 1; }
-	[[nodiscard]] inline cmp_mask_type getCMPId(CMP2) const noexcept { return 2; }
-	[[nodiscard]] inline auto getMask(auto const pID) const noexcept { return 1 << pID; }
+	[[nodiscard]] static inline mask_type getId(CMP0) noexcept { return 0; }
+	[[nodiscard]] static inline mask_type getId(CMP1) noexcept { return 1; }
+	[[nodiscard]] static inline mask_type getId(CMP2) noexcept { return 2; }
+
+	[[nodiscard]] static inline mask_type getId(TAG0) noexcept { return 0; }
+	[[nodiscard]] static inline mask_type getId(TAG1) noexcept { return 1; }
+	[[nodiscard]] static inline mask_type getId(TAG2) noexcept { return 2; }
+
+	[[nodiscard]] static inline auto getMask(auto const pID) noexcept { return 1 << pID; }
 
 	//TODO: ForAll_impl
 	using TypeProcessFunc = void(*)(Entity_t&);

@@ -12,7 +12,7 @@ class Entity
 {
 public:
 	//Friend class EntityManager tyoe
-	template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
 	friend struct EntityManager;
 
 private:
@@ -53,6 +53,17 @@ public:
 	* @return true if has the component. False if not.
 	*/
 	[[nodiscard]] inline bool hasComponent(auto const pId) const noexcept { return (components_ & pId); }
+
+	/*
+	*@brief Method to get the CMPs Mask.
+	* @return cmp_mask_type that signals the components that has the Entitiy
+	*/
+	[[nodiscard]] inline auto getComponentsMask() const noexcept { return components_; }
+
+	//TODO: HasTag
+	[[nodiscard]] inline bool hasTag(auto const pTagMask) noexcept { return tags_ & pTagMask; }
+	//TODO: GetTags
+	[[nodiscard]] inline auto getTagsMask() const noexcept { return tags_; }
 
 private:
 	//Counter of entities and used as ID
@@ -113,10 +124,7 @@ private:
 	inline void removeTag(tag_mask_type const pTagMask) noexcept { tags_ ^= pTagMask; }
 	//TODO: RemoveTags
 	// 
-	//TODO: HasTag
-	[[nodiscard]] inline bool hasTag(tag_mask_type const pTagMask) noexcept { tags_& pTagMask; }
-	//TODO: GetTags
-	[[nodiscard]] inline tag_mask_type getTags() const noexcept { return tags_; }
+	
 };
 
 #include "Entity.tpp"

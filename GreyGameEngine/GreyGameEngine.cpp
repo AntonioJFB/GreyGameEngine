@@ -25,15 +25,15 @@ struct AIComponent
 	int patrol[4]{10, 20, 30, 40};
 };
 
-enum Tags : uint8_t
-{
-	Player = 0, Enemy = 1, Obstacle = 2
-};
+struct PlayerTag {};
+struct EnemyTag {};
+struct ObstacleTag{};
+
 
 int main()
 {
 	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types, TagMaks y demás tipos
-	EntityManager<PhysicsComponent, RenderComponent, AIComponent, 5>EM{5};
+	EntityManager<PhysicsComponent, RenderComponent, AIComponent, PlayerTag, EnemyTag, ObstacleTag, 5>EM{5};
 
 	auto& entity = EM.createEntity();
 
@@ -43,17 +43,44 @@ int main()
 	auto& phycmp = EM.addComponent<PhysicsComponent>(entity, PhysicsComponent{});
 	auto& aicmp = EM.addComponent<AIComponent>(entity, AIComponent{});
 	auto& rendcmp = EM.addComponent<RenderComponent>(entity, RenderComponent{});
-	
-	auto& entity2 = EM.createEntity();
-	EM.addTag(entity2, Tags::Player);
-	auto& entity3 = EM.createEntity();
-	EM.addTag(entity3, Tags::Enemy);
-	auto& entity4 = EM.createEntity();
-	EM.addTag(entity4, Tags::Obstacle);
-	EM.addTag(entity4, Tags::Enemy);
-	EM.removeTag(entity4, Tags::Obstacle);
 
-	auto& entity5 = EM.createEntity();
+	auto hasPhys = EM.hasComponent<PhysicsComponent>(entity);
+	cout << "Entity1 has PhysicsComponent: " << hasPhys << "\n";
+
+	auto& AIcmp = EM.getComponent<AIComponent>(entity);
+	cout << "Entity1 AICmp patrol 0: { " << AIcmp.patrol[0] << " }\n";
+
+	auto const& renderCMPs = EM.getComponents<RenderComponent>();
+
+	EM.removeComponent<RenderComponent>(entity);
+	auto hasRender = EM.hasComponent<RenderComponent>(entity);
+	cout << "Entity1 has RenderComponent: " << hasRender << "\n";
+
+	EM.addTag<PlayerTag>(entity);
+
+	bool hasPlayerTag = EM.hasTag<PlayerTag>(entity);
+	cout << "Entity1 has PlayerTag: " << hasPlayerTag << "\n";
+
+	EM.removeTag<PlayerTag>(entity);
+
+	EM.hasTag<PlayerTag>(entity);
+
+	hasPlayerTag = EM.hasTag<PlayerTag>(entity);
+	cout << "Entity1 has PlayerTag: " << hasPlayerTag << "\n";
+
+	auto const& entities = EM.getEntities();
+	for (auto const& e : entities)
+		cout << "EntityID_: " << e.getID() << "\n";
+
+	auto* entitiy1cp = EM.getEntityByID(entity.getID());
+	if(entitiy1cp)
+		cout << "EntityID_: " << entitiy1cp->getID() << "\n";
+
+
+	/*auto& entity2 = EM.createEntity();
+	auto& entity3 = EM.createEntity();
+	auto& entity4 = EM.createEntity();
+	auto& entity5 = EM.createEntity();*/
 
 	EM.forAll();
 
