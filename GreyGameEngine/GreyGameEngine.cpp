@@ -2,13 +2,18 @@
 //
 
 #include <cstdint>
+#include <iostream>
 
 #include "GreyGameEngine.h"
 #include "Utils/MemViwer.hpp"
 #include "Manager/EntityManager.hpp"
 
+#include "Metaprogramming/Metaprogramming.hpp"
+
 using namespace std;
 using namespace MemViwer;
+
+void seeType(auto) { cout << __FUNCSIG__ << "\n"; }
 
 struct PhysicsComponent
 {
@@ -29,60 +34,38 @@ struct PlayerTag {};
 struct EnemyTag {};
 struct ObstacleTag{};
 
+using CMPList = MP::TypeList<PhysicsComponent, RenderComponent, AIComponent>;
+using TAGList = MP::TypeList<PlayerTag, EnemyTag, ObstacleTag>;
+
+template<typename CMPs, typename TAGs>
+struct GameEngine
+{
+	using cmps = MP::cmp_traits<CMPs>;
+	using tags = MP::tag_traits<TAGs>;
+};
+
 
 int main()
 {
+	using GE = GameEngine<CMPList, TAGList>;
+	GE Engine {};
+
+	static_assert(GE::tags::size() == 3);
+	static_assert(GE::tags::id<ObstacleTag>() == 1);
+	static_assert(GE::tags::mask<ObstacleTag>() == 0b10);
+
+	static_assert(GE::cmps::id<PhysicsComponent>() == 1);
+	static_assert(GE::cmps::mask<PhysicsComponent>() == 0b10);
+
+	static_assert(MP::is_same_v<PhysicsComponent, PhysicsComponent> == true);
+	static_assert(MP::is_same_v<PhysicsComponent, RenderComponent> == false);
+
+	static_assert(CMPList::contains<PhysicsComponent>() == true);
+	//TODO: A partir de ahora, el EntityManager tiene que recibir una lista de Componentes y una Lista de Tags
+	//TODO: A partir de ahora, el ComponentStorage tiene que recibir una lista de Componentes
+
 	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types, TagMaks y demás tipos
-	EntityManager<PhysicsComponent, RenderComponent, AIComponent, PlayerTag, EnemyTag, ObstacleTag, 5>EM{5};
-
-	auto& entity = EM.createEntity();
-
-	/*TODO: La inicializacion de una entidad deberia ir justo despues de su crecion porque, de momento, como uso vector.
-	si creo muchas entidades y hace resize, pierdo la referencia a esas entidades y casca el programa.*/
-
-	auto& phycmp = EM.addComponent<PhysicsComponent>(entity, PhysicsComponent{});
-	auto& aicmp = EM.addComponent<AIComponent>(entity, AIComponent{});
-	auto& rendcmp = EM.addComponent<RenderComponent>(entity, RenderComponent{});
-
-	auto hasPhys = EM.hasComponent<PhysicsComponent>(entity);
-	cout << "Entity1 has PhysicsComponent: " << hasPhys << "\n";
-
-	auto& AIcmp = EM.getComponent<AIComponent>(entity);
-	cout << "Entity1 AICmp patrol 0: { " << AIcmp.patrol[0] << " }\n";
-
-	auto const& renderCMPs = EM.getComponents<RenderComponent>();
-
-	EM.removeComponent<RenderComponent>(entity);
-	auto hasRender = EM.hasComponent<RenderComponent>(entity);
-	cout << "Entity1 has RenderComponent: " << hasRender << "\n";
-
-	EM.addTag<PlayerTag>(entity);
-
-	bool hasPlayerTag = EM.hasTag<PlayerTag>(entity);
-	cout << "Entity1 has PlayerTag: " << hasPlayerTag << "\n";
-
-	EM.removeTag<PlayerTag>(entity);
-
-	EM.hasTag<PlayerTag>(entity);
-
-	hasPlayerTag = EM.hasTag<PlayerTag>(entity);
-	cout << "Entity1 has PlayerTag: " << hasPlayerTag << "\n";
-
-	auto const& entities = EM.getEntities();
-	for (auto const& e : entities)
-		cout << "EntityID_: " << e.getID() << "\n";
-
-	auto* entitiy1cp = EM.getEntityByID(entity.getID());
-	if(entitiy1cp)
-		cout << "EntityID_: " << entitiy1cp->getID() << "\n";
-
-
-	/*auto& entity2 = EM.createEntity();
-	auto& entity3 = EM.createEntity();
-	auto& entity4 = EM.createEntity();
-	auto& entity5 = EM.createEntity();*/
-
-	EM.forAll();
+	//EntityManager<PhysicsComponent, RenderComponent, AIComponent, PlayerTag, EnemyTag, ObstacleTag, 5>EM{5};
 
 	return 0;
 }
