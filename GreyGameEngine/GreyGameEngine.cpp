@@ -42,6 +42,9 @@ struct GameEngine
 {
 	using cmps = MP::cmp_traits<CMPs>;
 	using tags = MP::tag_traits<TAGs>;
+	using storage_type = MP::replace_t<std::tuple, CMPs>;
+
+	storage_type storage_{};
 };
 
 
@@ -49,6 +52,8 @@ int main()
 {
 	using GE = GameEngine<CMPList, TAGList>;
 	GE Engine {};
+
+	seeType(Engine.storage_);
 
 	static_assert(GE::tags::size() == 3);
 	static_assert(GE::tags::id<ObstacleTag>() == 2);

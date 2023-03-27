@@ -81,7 +81,7 @@ namespace MP
 	//=========================================================================
 
 	//=========================================================================
-	//======================= TYPELIST & TRAITS ===============================
+	//================================ TYPELIST ===============================
 	//=========================================================================
 		
 	//TODO: Las typelist las tengo que definir en un fichero que se llame Types y meter ahi todos los tipos de structs y typelists
@@ -106,6 +106,27 @@ namespace MP
 		}
 	};
 
+	//=========================================================================
+
+	//=========================================================================
+	//=================== TEMPLATE TEMPLATE PARAMETERS ========================
+	//=========================================================================
+
+	//REPLACE
+	//
+	template<template<typename...> class NewT, typename List>
+	struct replace {};
+
+	template<template<typename...> class NewT, typename...Ts>
+	struct replace<NewT, TypeList<Ts...>> : type_id<NewT<Ts...>> {};
+
+	template<template<typename...> class NewT, typename List>
+	using replace_t = typename replace<NewT, List>::type;
+
+	//=========================================================================
+
+	//=========================================================================
+	//================================ TRAITS =================================
 	//=========================================================================
 
 	//TODO: Los traits los voy a usar dentro del EntityManager
