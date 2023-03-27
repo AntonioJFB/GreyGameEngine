@@ -67,6 +67,17 @@ namespace MP
 	template<std::size_t N, typename T, typename... Ts>
 	struct nth_type<N, T, Ts...> : type_id< nth_type<N-1, Ts...> >{};
 
+	//IFT
+	//
+	template <bool Cond, typename T, typename F>
+	struct IFT : type_id<F>{};
+
+	template<typename T, typename F>
+	struct IFT<true, T, F> : type_id<T>{};
+
+	template<bool Cond, typename T, typename F>
+	using IFT_t = typename IFT<Cond, T, F>::type;
+
 	//=========================================================================
 
 	//=========================================================================
@@ -79,7 +90,7 @@ namespace MP
 	template <typename... Ts>
 	struct TypeList
 	{
-		consteval static std::size_t size() noexcept { return sizeof...(Ts); }
+		consteval static std::uint8_t size() noexcept { return sizeof...(Ts); }
 
 		template<typename T>
 		consteval static bool contains() noexcept 
@@ -88,7 +99,7 @@ namespace MP
 		}
 
 		template<typename T>
-		consteval static std::size_t pos() noexcept
+		consteval static std::uint8_t pos() noexcept
 		{
 			static_assert(contains<T>());
 			return pos_type_v<T, Ts...>;
@@ -103,7 +114,16 @@ namespace MP
 	template<typename TAGLIST>
 	struct tag_traits
 	{
-		consteval static std::size_t size() noexcept { return TAGLIST::size(); };
+		using mask_type = 
+			IFT_t< TAGLIST::size() <= 8, uint8_t, 
+				IFT_t< TAGLIST::size() <= 16, uint16_t, 
+					IFT_t < TAGLIST::size() <= 32, uint32_t, 
+						std::size_t
+					>
+				>
+			>;
+
+		consteval static std::uint8_t size() noexcept { return TAGLIST::size(); };
 
 		template <typename TAG>
 		consteval static uint8_t id() noexcept { 
@@ -112,7 +132,7 @@ namespace MP
 		}
 
 		template<typename TAG>
-		consteval static uint8_t mask() noexcept { return (1 << id<TAG>()); }
+		consteval static mask_type mask() noexcept { return (1 << id<TAG>()); }
 	};
 
 	//=========================================================================
