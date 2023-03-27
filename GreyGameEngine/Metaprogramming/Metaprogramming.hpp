@@ -28,6 +28,48 @@ namespace MP
 	//=========================================================================
 
 	//=========================================================================
+	//====================== TEMPLATE TYPE METAFUNCTIONS ======================
+	//=========================================================================
+
+	//POS_TYPE
+	//
+	template <typename T, typename... Ts>
+	struct pos_type
+	{ static_assert(sizeof...(Ts) != 0, "ERROR: The list is empty!"); };
+
+	template<typename T, typename... Ts>
+	constexpr std::size_t pos_type_v = pos_type<T, Ts...>::value;
+
+	template<typename T, typename... Ts>
+	struct pos_type<T, T, Ts...> : constant<std::size_t, 0>{};
+
+	template <typename T, typename U, typename... Ts>
+	struct pos_type<T, U, Ts...> : constant <std::size_t, 1 + pos_type_v<T, Ts...>> {};
+
+	//NTH_TYPE
+	//
+	template<typename T>
+	struct type_id
+	{
+		using type = T;
+	};
+
+	template<std::size_t N, typename... Ts>
+	struct nth_type
+	{ static_assert(sizeof...(Ts) != 0, "ERROR: The List is empty!"); };
+
+	template<std::size_t N, typename...Ts>
+	using nth_type_t = typename nth_type<N, Ts...>::type;
+
+	template<typename T, typename... Ts>
+	struct nth_type<0, T, Ts...> : type_id<T>{};
+
+	template<std::size_t N, typename T, typename... Ts>
+	struct nth_type<N, T, Ts...> : type_id< nth_type<N-1, Ts...> >{};
+
+	//=========================================================================
+
+	//=========================================================================
 	//======================= TYPELIST & TRAITS ===============================
 	//=========================================================================
 		
@@ -44,6 +86,13 @@ namespace MP
 		{
 			return (false || ... || is_same_v<T, Ts>);
 		}
+
+		template<typename T>
+		consteval static std::size_t pos() noexcept
+		{
+			static_assert(contains<T>());
+			return pos_type_v<T, Ts...>;
+		}
 	};
 
 	//=========================================================================
@@ -58,8 +107,8 @@ namespace MP
 
 		template <typename TAG>
 		consteval static uint8_t id() noexcept { 
-			static_assert(TAGLIST::template contains<TAG>());
-			return 1; /*!!!Placeholder*/ 
+			static_assert(TAGLIST::template contains<TAG>()); //We need to explicitly signal that contains is a member template (not a member value nor a member function)
+			return TAGLIST::template pos<TAG>(); 
 		}
 
 		template<typename TAG>

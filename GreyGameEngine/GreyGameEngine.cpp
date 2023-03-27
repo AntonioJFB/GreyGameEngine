@@ -51,11 +51,11 @@ int main()
 	GE Engine {};
 
 	static_assert(GE::tags::size() == 3);
-	static_assert(GE::tags::id<ObstacleTag>() == 1);
-	static_assert(GE::tags::mask<ObstacleTag>() == 0b10);
+	static_assert(GE::tags::id<ObstacleTag>() == 2);
+	static_assert(GE::tags::mask<ObstacleTag>() == 0b100);
 
-	static_assert(GE::cmps::id<PhysicsComponent>() == 1);
-	static_assert(GE::cmps::mask<PhysicsComponent>() == 0b10);
+	static_assert(GE::cmps::id<PhysicsComponent>() == 0);
+	static_assert(GE::cmps::mask<PhysicsComponent>() == 0b01);
 
 	static_assert(MP::is_same_v<PhysicsComponent, PhysicsComponent> == true);
 	static_assert(MP::is_same_v<PhysicsComponent, RenderComponent> == false);
