@@ -152,8 +152,8 @@ namespace MP
 			return TAGLIST::template pos<TAG>(); 
 		}
 
-		template<typename TAG>
-		consteval static mask_type mask() noexcept { return (1 << id<TAG>()); }
+		template<typename... TAGs>
+		consteval static mask_type mask() noexcept { return (0 | ... | (1 << id<TAGs>())); }
 	};
 
 	//=========================================================================
