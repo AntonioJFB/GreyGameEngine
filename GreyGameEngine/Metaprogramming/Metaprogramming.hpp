@@ -114,14 +114,25 @@ namespace MP
 
 	//REPLACE
 	//
-	template<template<typename...> class NewT, typename List>
+	template<template<typename...> class NewT, typename List> //We need to specify that it now is a class
 	struct replace {};
 
 	template<template<typename...> class NewT, typename...Ts>
 	struct replace<NewT, TypeList<Ts...>> : type_id<NewT<Ts...>> {};
 
 	template<template<typename...> class NewT, typename List>
-	using replace_t = typename replace<NewT, List>::type;
+	using replace_t = typename replace<NewT, List>::type; //We need to specify that is a typename
+
+	//FORALL INSERT
+	//
+	template<template <typename...> typename T, typename List>
+	struct forall_insert_template{};
+
+	template<template <typename...> typename T, typename...Ts>
+	struct forall_insert_template<T, TypeList<Ts...>> : type_id<TypeList<T<Ts>...>>{};
+
+	template<template<class...> class T, typename List>
+	using forall_insert_template_t = typename forall_insert_template<T, List>::type;
 
 	//=========================================================================
 
@@ -139,7 +150,7 @@ namespace MP
 			IFT_t< TAGLIST::size() <= 8, uint8_t, 
 				IFT_t< TAGLIST::size() <= 16, uint16_t, 
 					IFT_t < TAGLIST::size() <= 32, uint32_t, 
-						std::size_t
+						uint64_t
 					>
 				>
 			>;

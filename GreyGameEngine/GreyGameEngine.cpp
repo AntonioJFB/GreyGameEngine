@@ -37,14 +37,23 @@ struct ObstacleTag{};
 using CMPList = MP::TypeList<PhysicsComponent, RenderComponent, AIComponent>;
 using TAGList = MP::TypeList<PlayerTag, EnemyTag, ObstacleTag>;
 
-template<typename CMPs, typename TAGs>
+template<typename CMPs, typename TAGs, std::size_t Capacity=10>
 struct GameEngine
 {
 	using cmps = MP::cmp_traits<CMPs>;
 	using tags = MP::tag_traits<TAGs>;
-	using storage_type = MP::replace_t<std::tuple, CMPs>;
 
-	storage_type storage_{};
+	using data_type = MP::cmp_traits<CMPs>::mask_type;
+
+	template<typename List>
+	using to_tuple = MP::replace_t<std::tuple, List>;
+
+	template<typename T>
+	using to_slotmap = SlotMap<T, data_type, Capacity>;
+
+	using storage_t = to_tuple<MP::forall_insert_template_t<to_slotmap, CMPs>>;
+
+	storage_t storage_{};
 };
 
 
