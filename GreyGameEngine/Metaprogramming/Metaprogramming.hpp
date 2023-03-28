@@ -112,7 +112,7 @@ namespace MP
 	//=================== TEMPLATE TEMPLATE PARAMETERS ========================
 	//=========================================================================
 
-	//REPLACE
+	//REPLACE (El de Fran)
 	//
 	template<template<typename...> class NewT, typename List> //We need to specify that it now is a class
 	struct replace {};
@@ -123,16 +123,116 @@ namespace MP
 	template<template<typename...> class NewT, typename List>
 	using replace_t = typename replace<NewT, List>::type; //We need to specify that is a typename
 
-	//FORALL INSERT
+	//FORALL INSERT (El de Fran)
 	//
-	template<template <typename...> typename T, typename List>
+	template<template <typename...> class T, typename List>
 	struct forall_insert_template{};
 
-	template<template <typename...> typename T, typename...Ts>
+	template<template <typename...> class T, typename...Ts>
 	struct forall_insert_template<T, TypeList<Ts...>> : type_id<TypeList<T<Ts>...>>{};
 
 	template<template<class...> class T, typename List>
 	using forall_insert_template_t = typename forall_insert_template<T, List>::type;
+
+	//============================================================================
+
+	//CONTAINER REPLACE (El de David)
+	//
+	//Example: container_replace_t<std::list, std::vector<int, float>> == std::list<int, float>
+
+	template<template<typename...> class NewCont, class OldCont>
+	struct replace_container{};
+
+	template<template<typename...> class NewCont, template<typename...> class OldCont, typename...Ts>
+	struct replace_container<NewCont, OldCont<Ts...>> : type_id<NewCont<Ts...>>{};
+
+	template<template<typename...> class NewCont, class OldCont>
+	using replace_container_t = typename replace_container<NewCont, OldCont>::type;
+
+	//FOR ALL ELEMENTS LIST REPLACE
+	//
+	/* using CMPs = TypeList<PhyCmp, InputCmp, RenderCmp>
+	 * for_all_elements_list_replace_t<std::vector, CMPs> == TypeList<std::vector<PhyCmp>, std::vector<InputCmp>....>
+	 */
+
+	template<template<typename...> class T, typename List>
+	struct forall_elements_list_insert{};
+
+	template<template<typename...> class T, typename...Ts>
+	struct forall_elements_list_insert<T, TypeList<Ts...>> : type_id<TypeList<T<Ts>...>>{};
+
+	template<template<typename...> class T, typename List>
+	using forall_elements_list_insert_t = forall_elements_list_insert<T, List>::type;
+
+	//REPLACE LIST
+	//
+	/*
+	* using CMPs = TypeList<PhyCmp, InputCmp, RenderCmp>
+	* replace_list_t<std::tuple, CMPs> == std::tuple<PhyCmp, InputCmp, RenderCmp>
+	*/
+
+	template<template<typename...> class T, typename List>
+	struct replace_list{};
+
+	template<template<typename...> class T, typename... Ts>
+	struct replace_list<T, TypeList<Ts...>> : type_id <T<Ts...>>{};
+
+	template<template<typename...> class T, typename List>
+	using replace_list_t = replace_list<T, List>::type;
+
+	//REPLACE ALL LIST
+	//
+	/*
+	* using CMPs = TypeList<PhyCmp, InputCmp, RenderCmp>
+	* replace_all_list_t<std::tuple, std::vector, CMPs> == std::tuple<std::vector<PhyCmp>, std::vector<InputCmp>...>
+	*/
+
+	template<template<typename...> class T1, template<typename...> class T2, typename List>
+	struct replace_all_list{};
+
+	template<template<typename...> class T1, template<typename...> class T2, typename... Ts>
+	struct replace_all_list<T1, T2, TypeList<Ts...>> : type_id<T1<T2<Ts>...>>{};
+
+	template<template<typename...> class T1, template<typename...> class T2, typename List>
+	using replace_all_list_t = replace_all_list<T1, T2, List>::type;
+
+	//ADD TYPES TO LIST
+	//
+
+	template<typename List, typename...Ts>
+	struct add_types_to_list{};
+
+	template<typename... Ts, typename...Ns>
+	struct add_types_to_list<TypeList<Ts...>, Ns...> : type_id<TypeList<Ts..., Ns...>>{};
+
+	template<typename List, typename...Ts>
+	using add_types_to_list_t = typename add_types_to_list<List, Ts...>::type;
+
+	//COMBINE TYPELISTS
+	//
+
+	template<typename List1, typename List2>
+	struct combine_typelists{};
+
+	template<typename... Ts1, typename... Ts2>
+	struct combine_typelists<TypeList<Ts1...>, TypeList<Ts2...>> : type_id<TypeList<Ts1..., Ts2...>>{};
+
+	template<typename List1, typename List2>
+	using combine_typelists_t = typename combine_typelists<List1, List2>::type;
+
+	//ERASE FIRST TYPE
+	//
+
+	template<typename List>
+	struct erase_first_type{};
+
+	template<typename T, typename... Ts>
+	struct erase_first_type<TypeList<T, Ts...>> : type_id<TypeList<Ts...>>{};
+
+	template<typename List>
+	using erase_first_type_t = typename erase_first_type<List>::type;
+
+	//TODO: Si tengo ganas hacer funciones para borrar el ultimo o un elemento exacto
 
 	//=========================================================================
 
