@@ -145,34 +145,34 @@ namespace GreyGameEngine
 	//=============================================================================
 
 	template<typename CMPs, typename TAGs, size_t Capacity>
-	template <typename TAG>
+	template <typename... Ts>
 	constexpr void
-	EntityManager<CMPs, TAGs, Capacity>::addTag(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::addTags(Entity_t& pEntity) noexcept
 	{
-		auto tagMask = tag_info::template mask<TAG>();
-		pEntity.addTag(tagMask);
+		auto tagMask = tag_info::template mask<Ts...>();
+		pEntity.addTags(tagMask);
 	}
 
 	//=============================================================================
 
 	template<typename CMPs, typename TAGs, size_t Capacity>
-	template <typename TAG>
+	template <typename... Ts>
 	constexpr void
-	EntityManager<CMPs, TAGs, Capacity>::removeTag(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::removeTags(Entity_t& pEntity) noexcept
 	{
-		auto tagMask = tag_info::template mask<TAG>();
-		pEntity.removeTag(tagMask);
+		auto tagMask = tag_info::template mask<Ts...>();
+		pEntity.removeTags(tagMask);
 	}
 
 	//=============================================================================
 
 	template<typename CMPs, typename TAGs, size_t Capacity>
-	template <typename TAG>
+	template <typename... Ts>
 	constexpr bool
-	EntityManager<CMPs, TAGs, Capacity>::hasTag(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::hasTags(Entity_t& pEntity) noexcept
 	{
-		auto tagMask = tag_info::template mask<TAG>();
-		return pEntity.hasTag(tagMask);
+		auto tagMask = tag_info::template mask<Ts...>();
+		return pEntity.hasTags(tagMask);
 
 	}
 

@@ -7,6 +7,9 @@
 
 #define NON_VALID_ENTITY_ID 0
 
+
+//TODO: Organiar lo que es public y lo que es private
+
 namespace GreyGameEngine
 {
 	template<typename CMPs, size_t Capacity>
@@ -49,13 +52,14 @@ namespace GreyGameEngine
 		/*
 		*@brief Method to get the ID of an Entity
 		*/
-		inline mask_type getID() const noexcept { return ID_; }
+		inline size_t getID() const noexcept { return ID_; }
 
 		/*
 		*@brief Method to set the ID of an Entity
 		*/
-		inline void setID(mask_type pID) noexcept { ID_ = pID; }
+		inline void setID(size_t pID) noexcept { ID_ = pID; }
 
+	private:
 		/*
 		*@brief Method to know if an Entity has a component.
 		* @param pId: ID of the component to check
@@ -63,18 +67,29 @@ namespace GreyGameEngine
 		*/
 		[[nodiscard]] inline bool hasComponent(auto const pId) const noexcept { return (components_ & pId); }
 
+		//TODO: Hacer HasAnyComponent
+
 		/*
 		*@brief Method to get the CMPs Mask.
 		* @return cmp_mask_type that signals the components that has the Entitiy
 		*/
-		[[nodiscard]] inline auto getComponentsMask() const noexcept { return components_; }
+		[[nodiscard]] inline mask_type getComponentsMask() const noexcept { return components_; }
 
-		//TODO: HasTag
-		[[nodiscard]] inline bool hasTag(auto const pTagMask) noexcept { return tags_ & pTagMask; }
-		//TODO: GetTags
-		[[nodiscard]] inline auto getTagsMask() const noexcept { return tags_; }
+		/*
+		* @brief Method that checks if an Entity has all specified Tags (Using a TagsMask)
+		* @return true if has all the tags. False otherwise.
+		*/
+		[[nodiscard]] inline bool hasTag(auto const pTagMask) noexcept { return (tags_ & pTagMask) == pTagMask; }
+		
+		//TODO: Hacer HasAnyTag
 
-	private:
+		/*
+		* @brief Method that get the mask of Tags of an Entity.
+		* @return masks of Tags of the Entity
+		*/
+		[[nodiscard]] inline mask_type getTagsMask() const noexcept { return tags_; }
+
+	public:
 		//Counter of entities and used as ID
 		inline static size_t nextID{ 0 };
 
@@ -122,16 +137,17 @@ namespace GreyGameEngine
 		template<typename CMP>
 		auto constexpr removeComponent(auto pCMPMask) noexcept;
 
-		//TODO: Todo lo relacionado con los tags esta cogido con pinzas porque lo voy a cambiar con metaprogramming
-		//TODO: AddTag
-		inline void addTag(mask_type const pTagMask) noexcept { tags_ |= pTagMask; }
-		//TODO: AddTags
-		// 
-		//TODO: RemoveTag
-		inline void removeTag(mask_type const pTagMask) noexcept { tags_ ^= pTagMask; }
-		//TODO: RemoveTags
-		// 
-
+		/*
+		* @brief Method to add a Tag to an Entity.
+		* @param Mask of the Tag or Tags to add.
+		*/
+		inline void addTags(mask_type const pTagMask) noexcept { tags_ |= pTagMask; }
+		
+		/*
+		* @brief Methos to remove Tags from an Entity.
+		* @param Maks of the Tag or Tags to remove
+		*/
+		inline void removeTags(mask_type const pTagMask) noexcept { tags_ ^= pTagMask; } 
 	};
 }
 

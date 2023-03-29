@@ -149,15 +149,15 @@ namespace GreyGameEngine
 
 		//TODO: Todo lo relacionado con los Tags está cogido con pinzas porque lo voy a cambiar con metaprogramming
 		//TODO: AddTag
-		template <typename TAG>
-		constexpr void addTag(Entity_t& pEntity) noexcept;
+		template <typename... Ts>
+		constexpr void addTags(Entity_t& pEntity) noexcept;
 		//TODO: RemoveTag 
 		//TODO: Podria hacer RemoveTags
-		template <typename TAG>
-		constexpr void removeTag(Entity_t& pEntity) noexcept;
+		template <typename... Ts>
+		constexpr void removeTags(Entity_t& pEntity) noexcept;
 		//TODO: HasTag
-		template <typename TAG>
-		constexpr bool hasTag(Entity_t& pEntity) noexcept;
+		template <typename... Ts>
+		constexpr bool hasTags(Entity_t& pEntity) noexcept;
 
 
 		//TODO: Todo lo del forAll lo tengo que hacer bien una vez tenga sistemas y metaprogramming funcionando

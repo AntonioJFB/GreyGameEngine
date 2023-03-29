@@ -100,31 +100,13 @@ int main()
 	auto* e = GE.getEntityByID(1);
 	std::cout << std::to_string( e->getID() ) << "\n";
 
-	GE.removeComponent<PhysicsComponent>(entity);
-
 	auto& entities = GE.getEntities();
-	for(auto& e : entities)
-	{
-		std::cout << std::to_string(e.getComponentsMask()) << "\n";
-	}
-
-	GE.removeComponents<RenderComponent, AIComponent>(entity);
-
-	for (auto& e : entities)
-	{
-		std::cout << std::to_string(e.getComponentsMask()) << "\n";
-	}
-
-	GE.addTag<PlayerTag>(entity);
 	
-	for (auto& e : entities)
-	{
-		if(GE.hasTag<PlayerTag>(entity))
-		{
-			std::cout << std::to_string(e.getTagsMask()) << "\n";
-			GE.removeTag<PlayerTag>(e);
-		}
-	}
+	GE.addTags < PlayerTag, ObstacleTag > (entity);
+
+	GE.setEntitiyForDestroy(entity);
+	
+	//GE.checkDeadEntities();
 
 	return 0;
 }
