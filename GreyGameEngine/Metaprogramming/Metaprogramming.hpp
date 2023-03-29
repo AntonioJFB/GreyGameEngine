@@ -112,7 +112,7 @@ namespace MP
 	//=================== TEMPLATE TEMPLATE PARAMETERS ========================
 	//=========================================================================
 
-	//REPLACE (El de Fran)
+	//REPLACE
 	//
 	template<template<typename...> class NewT, typename List> //We need to specify that it now is a class
 	struct replace {};
@@ -136,7 +136,7 @@ namespace MP
 
 	//============================================================================
 
-	//CONTAINER REPLACE (El de David)
+	//CONTAINER REPLACE
 	//
 	//Example: container_replace_t<std::list, std::vector<int, float>> == std::list<int, float>
 
@@ -243,31 +243,37 @@ namespace MP
 	//TODO: Los traits los voy a usar dentro del EntityManager
 	//TAG_TRAITS
 	//
-	template<typename TAGLIST>
-	struct tag_traits
+	template<typename TYPELIST>
+	struct common_traits
 	{
 		using mask_type = 
-			IFT_t< TAGLIST::size() <= 8, uint8_t, 
-				IFT_t< TAGLIST::size() <= 16, uint16_t, 
-					IFT_t < TAGLIST::size() <= 32, uint32_t, 
+			IFT_t< TYPELIST::size() <= 8, uint8_t, 
+				IFT_t< TYPELIST::size() <= 16, uint16_t, 
+					IFT_t < TYPELIST::size() <= 32, uint32_t, 
 						uint64_t
 					>
 				>
 			>;
 
-		consteval static std::uint8_t size() noexcept { return TAGLIST::size(); };
+		consteval static std::uint8_t size() noexcept { return TYPELIST::size(); };
 
-		template <typename TAG>
+		template <typename T>
 		consteval static uint8_t id() noexcept { 
-			static_assert(TAGLIST::template contains<TAG>()); //We need to explicitly signal that contains is a member template (not a member value nor a member function)
-			return TAGLIST::template pos<TAG>(); 
+			static_assert(TYPELIST::template contains<T>()); //We need to explicitly signal that contains is a member template (not a member value nor a member function)
+			return TYPELIST::template pos<T>(); 
 		}
 
-		template<typename... TAGs>
-		consteval static mask_type mask() noexcept { return (0 | ... | (1 << id<TAGs>())); }
+		template<typename... Ts>
+		consteval static mask_type mask() noexcept { return (0 | ... | (1 << id<Ts>())); }
 	};
 
 	//=========================================================================
+
+	//TAG_TRAITS
+	//
+	template<typename TAGLIST>
+	struct tag_traits : common_traits<TAGLIST>
+	{};
 
 	//CMP_TRAITS
 	//

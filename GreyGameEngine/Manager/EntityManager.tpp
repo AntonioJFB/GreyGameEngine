@@ -3,26 +3,26 @@
 
 namespace GreyGameEngine
 {
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
-	constexpr EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::EntityManager(const size_t pCapacity) noexcept
+	template<typename CMPs, typename TAGs, size_t Capacity>
+	constexpr EntityManager<CMPs, TAGs, Capacity>::EntityManager(const size_t pCapacity) noexcept
 	{
 		entities_.reserve(pCapacity);
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
-	constexpr typename EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::Entity_t&
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::createEntity() noexcept
+	template<typename CMPs, typename TAGs, size_t Capacity>
+	constexpr typename EntityManager<CMPs, TAGs, Capacity>::Entity_t&
+	EntityManager<CMPs, TAGs, Capacity>::createEntity() noexcept
 	{
 		return entities_.emplace_back();
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	constexpr auto*
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::GetEntityByID_impl(auto* self, const auto pID) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::GetEntityByID_impl(auto* self, const auto pID) noexcept
 	{
 		assert(("There aren't entities!", self->entities_.size()));
 
@@ -39,20 +39,20 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP>
 	constexpr CMP&
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::addComponent(Entity_t& pEntity, CMP& pComponent) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::addComponent(Entity_t& pEntity, CMP& pComponent) noexcept
 	{
 		return addComponent<CMP>(pEntity, CMP{ pComponent });
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP, typename... ParamTypes>
 	constexpr CMP&
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::addComponent(Entity_t& pEntity, ParamTypes&&... pParams) noexcept
 	{
 		return addComponent<CMP>(pEntity, CMP{ std::forward<ParamTypes>(pParams)... });
 
@@ -61,13 +61,13 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP>
 	constexpr CMP&
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::addComponent(Entity_t& pEntity, CMP&& pComponent) noexcept
 	{
 		//1.- Deberia comprobar si la entidad ya tiene ese componente
-		auto cmpMask = getMask<CMP>();
+		auto cmpMask = cmp_info::template mask<CMP>();
 
 		if (pEntity.hasComponent(cmpMask))
 		{
@@ -86,46 +86,47 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::removeComponent(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::removeComponent(Entity_t& pEntity) noexcept
 	{
-		auto cmpMask = getMask<CMP>();
+		auto cmpMask = cmp_info::template mask<CMP>(); 
 
-		assert(("The entity doesn't have this component!", pEntity.hasComponent(cmpMask)));
-
-		auto key = pEntity.removeComponent<CMP>(cmpMask);
-		components_.removeComponent<CMP>(key);
+		if(pEntity.hasComponent(cmpMask))
+		{
+			auto key = pEntity.removeComponent<CMP>(cmpMask);
+			components_.removeComponent<CMP>(key);
+		}
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
-	template <typename... CMPs>
+	template<typename CMPs, typename TAGs, size_t Capacity>
+	template <typename... Ts>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::removeComponents(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::removeComponents(Entity_t& pEntity) noexcept
 	{
-		(removeComponent<CMPs>(pEntity), ...);
+		(removeComponent<Ts>(pEntity), ...);
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP>
 	constexpr bool
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::hasComponent(Entity_t& pEntity) const noexcept
+	EntityManager<CMPs, TAGs, Capacity>::hasComponent(Entity_t& pEntity) const noexcept
 	{
-		auto cmpMask = getMask<CMP>();
+		auto cmpMask = cmp_info::template mask<CMP>();
 		return pEntity.hasComponent(cmpMask);
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP>
 	constexpr auto&
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::getComponent_impl(Entity_t const& pEntity, auto* self) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::getComponent_impl(Entity_t const& pEntity, auto* self) noexcept
 	{
 		auto key = pEntity.getComponent<CMP>();
 		return self->components_.getComponent<CMP>(key);
@@ -133,53 +134,53 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename CMP>
 	constexpr auto&
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::getComponents_impl(auto* self) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::getComponents_impl(auto* self) noexcept
 	{
 		return self->components_.getComponents<CMP>();
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename TAG>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::addTag(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::addTag(Entity_t& pEntity) noexcept
 	{
-		auto tagMask = getMask<TAG>(); //TODO: Esto cuando meta metaprogramming va a cambiar
+		auto tagMask = tag_info::template mask<TAG>();
 		pEntity.addTag(tagMask);
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename TAG>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::removeTag(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::removeTag(Entity_t& pEntity) noexcept
 	{
-		auto tagMask = getMask<TAG>();  //TODO: Esto cuando meta metaprogramming va a cambiar
+		auto tagMask = tag_info::template mask<TAG>();
 		pEntity.removeTag(tagMask);
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename TAG>
 	constexpr bool
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::hasTag(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::hasTag(Entity_t& pEntity) noexcept
 	{
-		auto tagMask = getMask<TAG>();  //TODO: Esto cuando meta metaprogramming va a cambiar
+		auto tagMask = tag_info::template mask<TAG>();
 		return pEntity.hasTag(tagMask);
 
 	}
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::checkDeadEntities() noexcept
+	EntityManager<CMPs, TAGs, Capacity>::checkDeadEntities() noexcept
 	{
 		bool thereAreDeadEntities{ false };
 
@@ -188,7 +189,7 @@ namespace GreyGameEngine
 			if (e.getID() == NON_VALID_ENTITY_ID)
 			{
 				thereAreDeadEntities = true;
-				removeComponents<CMP0, CMP1, CMP2>(e); //!!!!!!! TODO: Aqui debo pasarle la lista de componentes que tiene la entidad. Puede ser que no tenga todos los componentes.
+				removeComponents<CMPs>(e); //TODO: Comprobar que esto funciona
 			}
 		}
 
@@ -198,9 +199,9 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::removeDeadEntities() noexcept
+	EntityManager<CMPs, TAGs, Capacity>::removeDeadEntities() noexcept
 	{
 		entities_.erase(std::remove_if(entities_.begin(), entities_.end(),
 			[](Entity_t const& e) {
@@ -211,9 +212,9 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::forAll() noexcept
+	EntityManager<CMPs, TAGs, Capacity>::forAll() noexcept
 	{
 		//SI le pongo una captura, el lambda ya no es convertible a puntero a funcion.
 		//Un lambda  es un struct con el operador llamada, si le pongo captura va a tener variables miembro.
@@ -231,9 +232,9 @@ namespace GreyGameEngine
 
 	//=============================================================================
 
-	template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+	template<typename CMPs, typename TAGs, size_t Capacity>
 	constexpr void
-		EntityManager<CMP0, CMP1, CMP2, TAG0, TAG1, TAG2, Capacity>::forAll_impl(TypeProcessFunc process) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::forAll_impl(TypeProcessFunc process) noexcept
 	{
 		//TODO: Esto es una implementacion de juguete
 

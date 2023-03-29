@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <string>
 
 #include "GreyGameEngine.h"
 #include "Utils/MemViwer.hpp"
@@ -10,12 +11,9 @@
 
 #include "Metaprogramming/Metaprogramming.hpp"
 
-#include <list>
-
-using namespace std;
 using namespace MemViwer;
 
-void seeType(auto) { cout << __FUNCSIG__ << "\n"; }
+void seeType(auto) { std::cout << __FUNCSIG__ << "\n"; }
 
 struct PhysicsComponent
 {
@@ -56,62 +54,77 @@ struct GameEngine
 	using storage_t = to_tuple<MP::forall_insert_template_t<to_slotmap, CMPs>>;
 
 	storage_t storage_{};
-
-	//Testeando otras cosas de metaprogramming
-
-	using rpl_cont = MP::replace_container_t<std::list, std::vector<int>>;
-	rpl_cont rpl_cont_ {};
-
-	using fali = MP::forall_elements_list_insert_t<std::vector, CMPs>;
-	fali fali_{};
-
-	using replace = MP::replace_list_t<std::tuple, CMPs>;
-	replace repl_{};
-
-	using replace_all_l = MP::replace_all_list_t<std::tuple, SlotMap, CMPs>;
-	replace_all_l rplallL_{};
-
-	using newList = MP::add_types_to_list_t<CMPs, PlayerTag>;
-	newList newL_{};
-
-	using combList = MP::combine_typelists_t<CMPs, TAGs>;
-	combList cmbLst_{};
-
-	using eraseList = MP::erase_first_type_t<CMPs>;
-	eraseList ersFrs_{};
 };
 
 
 int main()
 {
-	using GE = GameEngine<CMPList, TAGList>;
-	GE Engine {};
-
-	seeType(Engine.storage_);
-	seeType(Engine.rpl_cont_);
-	seeType(Engine.fali_);
-	seeType(Engine.repl_);
-	seeType(Engine.rplallL_);
-	seeType(Engine.newL_);
-	seeType(Engine.cmbLst_);
-	seeType(Engine.ersFrs_);
-
-	static_assert(GE::tags::size() == 3);
-	static_assert(GE::tags::id<ObstacleTag>() == 2);
-	static_assert(GE::tags::mask<ObstacleTag>() == 0b100);
-
-	static_assert(GE::cmps::id<PhysicsComponent>() == 0);
-	static_assert(GE::cmps::mask<PhysicsComponent>() == 0b01);
-
-	static_assert(MP::is_same_v<PhysicsComponent, PhysicsComponent> == true);
-	static_assert(MP::is_same_v<PhysicsComponent, RenderComponent> == false);
-
-	static_assert(CMPList::contains<PhysicsComponent>() == true);
 	//TODO: A partir de ahora, el EntityManager tiene que recibir una lista de Componentes y una Lista de Tags
 	//TODO: A partir de ahora, el ComponentStorage tiene que recibir una lista de Componentes
 
 	//TODO: El EntityManager debería recibir todos los template parameters de configuracion de los SlotMaps, key_types, TagMaks y demás tipos
 	//EntityManager<PhysicsComponent, RenderComponent, AIComponent, PlayerTag, EnemyTag, ObstacleTag, 5>EM{5};
+
+	using GameEngine = GreyGameEngine::EntityManager<CMPList, TAGList, 10>;
+	GameEngine GE{};
+
+	auto& entity = GE.createEntity();
+	auto& phy_cmp = GE.addComponent<PhysicsComponent>(entity, 10, 20, 30);
+	auto& rend_cmp = GE.addComponent<RenderComponent>(entity);
+	auto& ai_cmp = GE.addComponent<AIComponent>(entity);
+
+	auto& phys_cmps = GE.getComponents<PhysicsComponent>();
+
+	for(auto const& cmp : phys_cmps)
+	{
+		std::cout << cmp.x << cmp.y << cmp.z << "\n";
+	}
+
+	auto& rend_cmps = GE.getComponents<RenderComponent>();
+
+	for (auto const& cmp : rend_cmps)
+	{
+		std::cout << cmp.sprite << "\n";
+	}
+
+	auto& ai_cmps = GE.getComponents<AIComponent>();
+
+	for (auto const& cmp : ai_cmps)
+	{
+		std::cout << cmp.patrol[0]<< "\n";
+	}
+
+	phy_cmp = GE.getComponent<PhysicsComponent>(entity);
+	std::cout << phy_cmp.x << phy_cmp.y << phy_cmp.z << "\n";
+
+	auto* e = GE.getEntityByID(1);
+	std::cout << std::to_string( e->getID() ) << "\n";
+
+	GE.removeComponent<PhysicsComponent>(entity);
+
+	auto& entities = GE.getEntities();
+	for(auto& e : entities)
+	{
+		std::cout << std::to_string(e.getComponentsMask()) << "\n";
+	}
+
+	GE.removeComponents<RenderComponent, AIComponent>(entity);
+
+	for (auto& e : entities)
+	{
+		std::cout << std::to_string(e.getComponentsMask()) << "\n";
+	}
+
+	GE.addTag<PlayerTag>(entity);
+	
+	for (auto& e : entities)
+	{
+		if(GE.hasTag<PlayerTag>(entity))
+		{
+			std::cout << std::to_string(e.getTagsMask()) << "\n";
+			GE.removeTag<PlayerTag>(e);
+		}
+	}
 
 	return 0;
 }

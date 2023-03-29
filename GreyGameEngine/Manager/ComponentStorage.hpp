@@ -2,12 +2,15 @@
 
 #include <tuple>
 #include "../Utils/DataStructures/SlotMap.h"
+#include "../Metaprogramming/Metaprogramming.hpp"
 
 namespace GreyGameEngine
 {
-	template <typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
-	class ComponentStorage
+	template <typename CMPs, size_t Capacity>
+	struct ComponentStorage
 	{
+		using cmp_info = MP::cmp_traits<CMPs>;
+
 	public:
 		/*
 		*@brief Default constructor of ComponentStorage
@@ -102,18 +105,18 @@ namespace GreyGameEngine
 		constexpr void clearComponents() noexcept;
 
 	private:
-		//TODO: Esto es bastante guarro, cuando haga la lista de CMPs tengo que cambiar a hacer un parameter pack 
-		//y con la CMPList de metaprogramming
+		
+		using data_type = cmp_info::mask_type;
 
-		//Tuple that contains the SlotMaps of components
-		template<typename CMP_T>
-		using CMP_Storage_Type = SlotMap<CMP_T, size_t, Capacity>;
+		template<typename T>
+		using to_slotmap = SlotMap<T, data_type, Capacity>;
 
-		std::tuple
-			<	CMP_Storage_Type<CMP0>
-			, CMP_Storage_Type<CMP1>
-			, CMP_Storage_Type<CMP2>
-			> components_{};
+		template<typename List>
+		using to_tuple = MP::replace_t<std::tuple, List>;
+
+		using storage_t = to_tuple<MP::forall_insert_template_t<to_slotmap, CMPs>>;
+
+		storage_t components_{};
 
 		/*
 		* @brief Implementation method to get the components when this is const or not

@@ -9,22 +9,29 @@
 
 namespace GreyGameEngine
 {
-	template<typename CMP0, typename CMP1, typename CMP2, size_t Capacity>
+	template<typename CMPs, size_t Capacity>
 	class Entity
 	{
 	public:
 		//Friend class EntityManager tyoe
-		template <typename CMP0, typename CMP1, typename CMP2, typename TAG0, typename TAG1, typename TAG2, size_t Capacity>
+		template <typename CMPs, typename TAGs, size_t Capacity>
 		friend struct EntityManager;
 
+		using cmp_info = MP::cmp_traits<CMPs>;
+
 	private:
+		using mask_type = cmp_info::mask_type;
+
 		//Type of the key_strage of component Keys
 		template <typename T>
-		using key_type = SlotMap<T, size_t, Capacity>::key_type; //TODO: El segundo parametro deberia ser del mismo tipo que el de los slotmaps de del componentSotrage. Deberia recibirlo por template parameter (?)
+		using to_key_type = SlotMap<T, mask_type, Capacity>::key_type;
 
-		//TODO: Cuando vea la metaprogramming, tengo que modificarlo
+		template<typename List>
+		using to_key_tuple = MP::replace_t<std::tuple, List>;
+
+		//TODO: Probar que funcione
 		//Key Storage type
-		using key_storageT = std::tuple<key_type<CMP0>, key_type<CMP1>, key_type<CMP2>>;
+		using key_storageT = to_key_tuple<MP::forall_insert_template_t<to_key_type, CMPs>>;
 
 	public:
 		/*
@@ -42,12 +49,12 @@ namespace GreyGameEngine
 		/*
 		*@brief Method to get the ID of an Entity
 		*/
-		inline size_t getID() const noexcept { return ID_; }
+		inline mask_type getID() const noexcept { return ID_; }
 
 		/*
 		*@brief Method to set the ID of an Entity
 		*/
-		inline void setID(size_t pID) noexcept { ID_ = pID; }
+		inline void setID(mask_type pID) noexcept { ID_ = pID; }
 
 		/*
 		*@brief Method to know if an Entity has a component.
@@ -75,12 +82,10 @@ namespace GreyGameEngine
 		size_t ID_{ ++nextID };
 
 		//Components bit mask
-		using cmp_mask_type = uint8_t;
-		uint8_t components_{};
+		mask_type components_{};
 
 		//Tagas bit mask
-		using tag_mask_type = uint8_t;
-		uint8_t tags_{};
+		mask_type tags_{};
 
 		//Storage of Component keys
 		key_storageT key_storage{};
@@ -119,11 +124,11 @@ namespace GreyGameEngine
 
 		//TODO: Todo lo relacionado con los tags esta cogido con pinzas porque lo voy a cambiar con metaprogramming
 		//TODO: AddTag
-		inline void addTag(tag_mask_type const pTagMask) noexcept { tags_ |= pTagMask; }
+		inline void addTag(mask_type const pTagMask) noexcept { tags_ |= pTagMask; }
 		//TODO: AddTags
 		// 
 		//TODO: RemoveTag
-		inline void removeTag(tag_mask_type const pTagMask) noexcept { tags_ ^= pTagMask; }
+		inline void removeTag(mask_type const pTagMask) noexcept { tags_ ^= pTagMask; }
 		//TODO: RemoveTags
 		// 
 
