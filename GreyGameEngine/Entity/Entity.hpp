@@ -37,6 +37,21 @@ namespace GreyGameEngine
 		using key_storageT = to_key_tuple<MP::forall_insert_template_t<to_key_type, CMPs>>;
 
 	public:
+		//Counter of entities and used as ID
+		inline static size_t nextID{ 0 };
+
+		//ID of the Entity. Increases automatically when an entity is created.
+		size_t ID_{ ++nextID };
+
+		//Components bit mask
+		mask_type components_{};
+
+		//Tagas bit mask
+		mask_type tags_{};
+
+		//Storage of Component keys
+		key_storageT key_storage{};
+
 		/*
 		*@brief Default constructor of Entity
 		*/
@@ -89,23 +104,6 @@ namespace GreyGameEngine
 		*/
 		[[nodiscard]] inline mask_type getTagsMask() const noexcept { return tags_; }
 
-	public:
-		//Counter of entities and used as ID
-		inline static size_t nextID{ 0 };
-
-		//ID of the Entity. Increases automatically when an entity is created.
-		size_t ID_{ ++nextID };
-
-		//Components bit mask
-		mask_type components_{};
-
-		//Tagas bit mask
-		mask_type tags_{};
-
-		//Storage of Component keys
-		key_storageT key_storage{};
-
-	private:
 		/*
 		*@brief Method to get the key of the component of type CMP
 		* @tparam CMP type of the component

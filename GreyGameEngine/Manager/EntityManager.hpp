@@ -29,7 +29,7 @@ namespace GreyGameEngine
 		* @brief Constructor of the EntitytManager. Reserves the initial size for the vector of entities.
 		* @param pCapacity: Initial number of entities.
 		*/
-		constexpr explicit EntityManager(const size_t pCapacity = 5) noexcept;
+		constexpr explicit EntityManager(const size_t pCapacity = Capacity) noexcept;
 
 		/*
 		* @brief Method to create a new Entity and add it to the Entity Storage.
@@ -100,14 +100,6 @@ namespace GreyGameEngine
 		*/
 		template<typename CMP>
 		void constexpr removeComponent(Entity_t& pEntity) noexcept;
-
-		/*
-		* @brief Method to remove a series of components from an Entity
-		* @tparam CMPs: types of the components to remove
-		* @param pEntity: Reference to the Entity to remove the components
-		*/
-		template<typename... Ts>
-		void constexpr removeComponents(Entity_t& pEntity, MP::TypeList<Ts...>) noexcept;
 
 		/*
 		* @brief Method to remove a series of components from an Entity
@@ -232,12 +224,13 @@ namespace GreyGameEngine
 		template<typename CMP>
 		[[nodiscard]] static constexpr auto& getComponents_impl(auto* self) noexcept;
 
-
-		//USANDO EL TAG DISPATCHING --> TODO: LUEGO ESTO SE AUTOMATIZA CON METAPROGRAMMING
-		//TODO: Esto a lo mejor deberia moverlo al component storage. De momento lo dejo aqui
-		//TODO: SI quiero acceder a los elementos del component estorage haciendo uso del ID estas funciones y las dos publicas de arriba deberian ser static.
-
-		//TODO: Creo que ya no me hace falta implementar el getId ni el getMask porque uso los traits y la MP
+		/*
+		* @brief Method to remove a series of components from an Entity
+		* @tparam CMPs: types of the components to remove
+		* @param pEntity: Reference to the Entity to remove the components
+		*/
+		template<typename... Ts>
+		void constexpr removeComponents(Entity_t& pEntity, MP::TypeList<Ts...>) noexcept;
 
 		//TODO: ForAll_impl
 		using TypeProcessFunc = void(*)(Entity_t&);
