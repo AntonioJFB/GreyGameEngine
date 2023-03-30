@@ -13,7 +13,7 @@
 
 using namespace MemViwer;
 
-void seeType(auto) { std::cout << __FUNCSIG__ << "\n"; }
+//void seeType(auto) { std::cout << __FUNCSIG__ << "\n"; }
 
 struct PhysicsComponent
 {
@@ -104,9 +104,13 @@ int main()
 	
 	GE.addTags < PlayerTag, ObstacleTag > (entity);
 
+	GE.removeComponent<PhysicsComponent>(entity);
+
+	GE.removeComponents<RenderComponent, AIComponent>(entity);
+
 	GE.setEntitiyForDestroy(entity);
 	
-	//GE.checkDeadEntities();
+	GE.update();
 
 	return 0;
 }

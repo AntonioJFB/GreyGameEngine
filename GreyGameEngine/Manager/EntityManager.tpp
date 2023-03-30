@@ -105,9 +105,19 @@ namespace GreyGameEngine
 	template<typename CMPs, typename TAGs, size_t Capacity>
 	template <typename... Ts>
 	constexpr void
-	EntityManager<CMPs, TAGs, Capacity>::removeComponents(Entity_t& pEntity) noexcept
+	EntityManager<CMPs, TAGs, Capacity>::removeComponents(Entity_t& pEntity, MP::TypeList<Ts...>) noexcept
 	{
 		(removeComponent<Ts>(pEntity), ...);
+	}
+
+	//=============================================================================
+
+	template<typename CMPs, typename TAGs, size_t Capacity>
+	template <typename... Ts>
+	constexpr void
+		EntityManager<CMPs, TAGs, Capacity>::removeComponents(Entity_t& pEntity) noexcept
+	{
+		removeComponents(pEntity, CMPs{});
 	}
 
 	//=============================================================================
@@ -180,7 +190,7 @@ namespace GreyGameEngine
 
 	template<typename CMPs, typename TAGs, size_t Capacity>
 	constexpr void
-	EntityManager<CMPs, TAGs, Capacity>::checkDeadEntities() noexcept
+	EntityManager<CMPs, TAGs, Capacity>::update() noexcept
 	{
 		bool thereAreDeadEntities{ false };
 
@@ -189,7 +199,7 @@ namespace GreyGameEngine
 			if (e.getID() == NON_VALID_ENTITY_ID)
 			{
 				thereAreDeadEntities = true;
-				removeComponents<CMPs>(e); //TODO: Comprobar que esto funciona
+				removeComponents(e);
 			}
 		}
 

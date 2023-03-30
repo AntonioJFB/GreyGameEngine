@@ -106,7 +106,15 @@ namespace GreyGameEngine
 		* @tparam CMPs: types of the components to remove
 		* @param pEntity: Reference to the Entity to remove the components
 		*/
-		template<typename... CMPs>
+		template<typename... Ts>
+		void constexpr removeComponents(Entity_t& pEntity, MP::TypeList<Ts...>) noexcept;
+
+		/*
+		* @brief Method to remove a series of components from an Entity
+		* @tparam CMPs: types of the components to remove
+		* @param pEntity: Reference to the Entity to remove the components
+		*/
+		template<typename... Ts>
 		void constexpr removeComponents(Entity_t& pEntity) noexcept;
 
 		/*
@@ -167,11 +175,11 @@ namespace GreyGameEngine
 		//TODO: ForAllMatchingPairs
 
 		/*
-		* @brief Method that checks if there are entities marked as dead.
+		* @brief Method that checks if there are entities marked as dead to remove them.
 		* If an Entity is marked with an invalid ID, it erases all the components of the entity.
 		* If there are Dead entities, it calls removeDeadEntites.
 		*/
-		void constexpr checkDeadEntities() noexcept;
+		void constexpr update() noexcept;
 
 		/*
 		* @brief Method that sets to an invalid ID the ID of an entity to mark it as dead.
